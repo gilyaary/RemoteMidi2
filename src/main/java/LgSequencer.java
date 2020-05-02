@@ -7,17 +7,21 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 public class LgSequencer implements Sequencer {
+
     private Sequence sequence;
     Semaphore sequencePlayerSemaphore = new Semaphore(1);
     SequencerRunnable sequencerRunnable = new SequencerRunnable();
     Thread sequencerThread = null;
+    long songPositionMs = 0;
+    private float bpm = 60;
 
-    public void initialize(){
+    private void initialize(){
+        sequencerRunnable.setBpm(this.bpm);
         sequencerThread = new Thread(sequencerRunnable);
         sequencerThread.start();
     }
 
-    public void destroy(){
+    private void destroy(){
         stop();
         sequencerRunnable.exit();
     }
@@ -50,6 +54,7 @@ public class LgSequencer implements Sequencer {
     @Override
     public void start() {
         if(this.sequence != null){
+            sequencerRunnable.setBpm(this.getTempoInBPM());
             //a mutex is a Semaphor that allows only one thread at a time to access a protected method
             if(sequencePlayerSemaphore.availablePermits() > 0) {
                 try {
@@ -75,6 +80,7 @@ public class LgSequencer implements Sequencer {
                 try {
                     sequencePlayerSemaphore.tryAcquire(10, TimeUnit.MILLISECONDS);
                     //start the thread. We want only one executing thread
+                    sequencerRunnable.stop();
                 } catch (Exception ex) {
 
                 } finally {
@@ -141,12 +147,13 @@ public class LgSequencer implements Sequencer {
 
     @Override
     public float getTempoInBPM() {
-        return 0;
+        return bpm;
     }
 
     @Override
     public void setTempoInBPM(float bpm) {
-
+        this.bpm = bpm;
+        this.sequencerRunnable.setBpm(bpm);
     }
 
     @Override
@@ -174,6 +181,9 @@ public class LgSequencer implements Sequencer {
         return 0;
     }
 
+
+
+
     @Override
     public long getTickPosition() {
         return 0;
@@ -183,6 +193,8 @@ public class LgSequencer implements Sequencer {
     public void setTickPosition(long tick) {
 
     }
+
+
 
     @Override
     public long getMicrosecondLength() {
@@ -196,12 +208,12 @@ public class LgSequencer implements Sequencer {
 
     @Override
     public void open() throws MidiUnavailableException {
-
+        this.initialize();
     }
 
     @Override
     public void close() {
-
+        this.destroy();
     }
 
     @Override
@@ -209,10 +221,15 @@ public class LgSequencer implements Sequencer {
         return false;
     }
 
+
+
     @Override
     public long getMicrosecondPosition() {
-        return 0;
+        //System.out.println(sequencerRunnable.songPositionMs);
+        return sequencerRunnable.songPositionMs * 1000;
     }
+
+
 
     @Override
     public int getMaxReceivers() {
