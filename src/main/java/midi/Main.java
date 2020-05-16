@@ -18,11 +18,13 @@ public class Main {
 
         //String midi_file = "/home/gil/Music/bach2.mid";
         //String midi_file = "/home/gil/Music/mozk313c.mid";
-        //Sequence sequence = MidiSystem.getSequence(new File(midi_file));
-        Sequence sequence = generateMidi();
+        String midi_file = "/home/gil/Music/gil_music.mid";
+
+        Sequence sequence = MidiSystem.getSequence(new File(midi_file));
+        //Sequence sequence = generateMidi();
 
         seq.setSequence(sequence);
-        seq.setTempoInBPM(10);
+        seq.setTempoInBPM(60);
         long time = System.currentTimeMillis();
         seq.start();
         //seq.close();

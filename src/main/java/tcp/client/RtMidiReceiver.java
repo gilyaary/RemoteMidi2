@@ -40,6 +40,9 @@ public class RtMidiReceiver implements Receiver {
 
         try {
             sendMessage(midiMessage, "2#A.1");
+            sendMessage(midiMessage, "2#A.2");
+            sendMessage(midiMessage, "2#A.3");
+            //sendMessage(midiMessage, "2#A.4");
             //sendMessage(midiMessage, "2#A.2");
             //sendMessage(midiMessage, "2#A.1");
             //sendMessage(midiMessage, "2#A.2");
