@@ -2,32 +2,29 @@ package tcp.client;
 
 import org.springframework.stereotype.Component;
 
-import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.Receiver;
-import javax.sound.midi.ShortMessage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 
 @Component
-public class RtMidiReceiver implements Receiver {
+public class RtMidiConnection {
 
     private Socket soc;
     private InputStream in;
     private OutputStream out;
+    private InputStreamReader reader;
 
     public void init() throws IOException {
         this.soc = new Socket("localhost", 8888);
         this.in = soc.getInputStream();
         this.out = soc.getOutputStream();
+        this.reader = new InputStreamReader(in);
     }
 
-    @Override
-    public void send(MidiMessage midiMessage, long l) {
+    public void sendMidiMessage(MidiMessage midiMessage, long l) {
         try {
-            sendMessage(midiMessage, "2#A.1");
+            sendMidiMessage(midiMessage, "2#A.1");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -36,7 +33,7 @@ public class RtMidiReceiver implements Receiver {
     boolean lastWasOn = false;
     int lastNote = 0;
 
-    public void sendMessage(MidiMessage midiMessage, String commandRouting) {
+    public void sendMidiMessage(MidiMessage midiMessage, String commandRouting) {
 
         byte[] bytes = midiMessage.getMessage();
         String str = new String(bytes);
@@ -61,7 +58,34 @@ public class RtMidiReceiver implements Receiver {
         }
     }
 
-    @Override
+    public String sendCommand(String commandRouting) {
+
+        StringBuffer cmd = new StringBuffer(commandRouting);
+        cmd.append("@QQQ");
+        String cmdString = cmd.toString();
+        try {
+            out.write(cmdString.getBytes());
+            out.flush();
+            //System.out.println(cmdString);
+            BufferedReader br = new BufferedReader(reader);
+            StringBuffer lines = new StringBuffer();
+            while(true) {
+                String response = br.readLine();
+                if(response == null || response.equals("@@@")){
+                    return lines.toString();
+                }
+                else{
+                    lines.append(response);
+                    lines.append("\n");int i=9;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+
     public void close() {
         try {
             this.in.close();

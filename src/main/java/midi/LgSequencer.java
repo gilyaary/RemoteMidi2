@@ -15,6 +15,7 @@ public class LgSequencer implements Sequencer {
     Thread sequencerThread = null;
     long songPositionMs = 0;
     private float bpm = 60;
+    private boolean running;
 
     private void initialize(){
         sequencerRunnable.setBpm(this.bpm);
@@ -51,9 +52,9 @@ public class LgSequencer implements Sequencer {
             Each track has it's own tick length.
      */
 
-
     @Override
     public void start() {
+        this.running = true;
         if(this.sequence != null){
             sequencerRunnable.setBpm(this.getTempoInBPM());
             //a mutex is a Semaphor that allows only one thread at a time to access a protected method
@@ -73,6 +74,24 @@ public class LgSequencer implements Sequencer {
         }
     }
 
+    public void resume() {
+        this.running = true;
+        if(this.sequence != null){
+            sequencerRunnable.setBpm(this.getTempoInBPM());
+            if(sequencePlayerSemaphore.availablePermits() > 0) {
+                try {
+                    sequencePlayerSemaphore.tryAcquire(10, TimeUnit.MILLISECONDS);
+                    sequencerRunnable.play();
+                } catch (Exception ex) {
+
+                } finally {
+                    sequencePlayerSemaphore.release();
+                }
+            }
+        }
+    }
+
+
     @Override
     public void stop() {
         if(this.sequence != null){
@@ -89,12 +108,13 @@ public class LgSequencer implements Sequencer {
                 }
             }
         }
+        this.running = false;
     }
 
 
     @Override
     public boolean isRunning() {
-        return false;
+        return running;
     }
 
     @Override

@@ -65,7 +65,7 @@ public class SequencerRunnable implements Runnable{
         while( ! this.exit) {
             //just loop and wait while we are not playing or recording
             while(this.stopped){
-                TimeUtil.sleep(1);
+                TimeUtil.sleep(10);
             }
 
             long loopStartTime = System.currentTimeMillis();
