@@ -57,27 +57,6 @@ public class LgSequencer implements Sequencer {
         this.running = true;
         if(this.sequence != null){
             sequencerRunnable.setBpm(this.getTempoInBPM());
-            //a mutex is a Semaphor that allows only one thread at a time to access a protected method
-            if(sequencePlayerSemaphore.availablePermits() > 0) {
-                try {
-                    sequencePlayerSemaphore.tryAcquire(10, TimeUnit.MILLISECONDS);
-                    //start the thread. We want only one executing thread
-                    sequencerRunnable.setSequence(this.sequence);
-                    sequencerRunnable.play();
-
-                } catch (Exception ex) {
-
-                } finally {
-                    sequencePlayerSemaphore.release();
-                }
-            }
-        }
-    }
-
-    public void resume() {
-        this.running = true;
-        if(this.sequence != null){
-            sequencerRunnable.setBpm(this.getTempoInBPM());
             if(sequencePlayerSemaphore.availablePermits() > 0) {
                 try {
                     sequencePlayerSemaphore.tryAcquire(10, TimeUnit.MILLISECONDS);
@@ -111,7 +90,6 @@ public class LgSequencer implements Sequencer {
         this.running = false;
     }
 
-
     @Override
     public boolean isRunning() {
         return running;
@@ -123,7 +101,7 @@ public class LgSequencer implements Sequencer {
             //a mutex is a Semaphor that allows only one thread at a time to access a protected method
             if(sequencePlayerSemaphore.availablePermits() > 0) {
                 try {
-                    sequencePlayerSemaphore.tryAcquire(10, TimeUnit.MILLISECONDS);
+                    //sequencePlayerSemaphore.tryAcquire(10, TimeUnit.MILLISECONDS);
                     //start the thread. We want only one executing thread
                 } catch (Exception ex) {
 
@@ -140,7 +118,7 @@ public class LgSequencer implements Sequencer {
             //a mutex is a Semaphor that allows only one thread at a time to access a protected method
             if(sequencePlayerSemaphore.availablePermits() > 0) {
                 try {
-                    sequencePlayerSemaphore.tryAcquire(10, TimeUnit.MILLISECONDS);
+                    //sequencePlayerSemaphore.tryAcquire(10, TimeUnit.MILLISECONDS);
                     //start the thread. We want only one executing thread
                 } catch (Exception ex) {
 
@@ -202,9 +180,6 @@ public class LgSequencer implements Sequencer {
         return 0;
     }
 
-
-
-
     @Override
     public long getTickPosition() {
         return 0;
@@ -214,8 +189,6 @@ public class LgSequencer implements Sequencer {
     public void setTickPosition(long tick) {
 
     }
-
-
 
     @Override
     public long getMicrosecondLength() {
@@ -242,15 +215,11 @@ public class LgSequencer implements Sequencer {
         return false;
     }
 
-
-
     @Override
     public long getMicrosecondPosition() {
         //System.out.println(sequencerRunnable.songPositionMs);
         return sequencerRunnable.songPositionMs * 1000;
     }
-
-
 
     @Override
     public int getMaxReceivers() {

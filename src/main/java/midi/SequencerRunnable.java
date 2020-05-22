@@ -24,7 +24,7 @@ public class SequencerRunnable implements Runnable{
 
     enum MODE {PLAYBACK, RECORD}
     MODE mode;
-    long positionFromStart = 0;
+    //long positionFromStart = 0;
 
     public SequencerRunnable(){}
 
@@ -62,19 +62,21 @@ public class SequencerRunnable implements Runnable{
             e.printStackTrace();
         }
 
+
         while( ! this.exit) {
             //just loop and wait while we are not playing or recording
             while(this.stopped){
                 TimeUtil.sleep(10);
             }
 
-            long loopStartTime = System.currentTimeMillis();
+            long loopStartTime = System.currentTimeMillis() - songPositionMs;
             while( ! stopped) {
                 playEvents();
                 //Todo: we need a notification when BPM is modified at play/record time
                 songPositionMs = System.currentTimeMillis() - loopStartTime;
-                //midi.TimeUtil.sleep(1);
+                midi.TimeUtil.sleep(1);
             }
+
         }
     }
 
@@ -91,21 +93,27 @@ public class SequencerRunnable implements Runnable{
     public void play() {
         this.mode = MODE.PLAYBACK;
         this.stopped = false;
-        this.notifyAll();
+        //this.notifyAll();
     }
     public void record() {
         this.mode = MODE.RECORD;
         this.stopped = false;
-        this.notifyAll();
+        //this.notifyAll();
     }
     public void pause() {
         this.stopped = true;
-        this.notifyAll();
+        //this.notifyAll();
     }
     public void stop() {
-        this.pause();
-        this.positionFromStart = 0;
-        this.notifyAll();
+        this.stopped = true;
+        /*
+        this.songPositionMs = 0;
+        for(int i=0; i<this.trackEventsCurrentIndexes.length; i++){
+            this.trackEventsCurrentIndexes[i] = 0;
+        }
+        */
+
+        //this.notifyAll();
     }
 
     private void playEvents() {
@@ -126,7 +134,7 @@ public class SequencerRunnable implements Runnable{
             //we use the tick for timing. When event_tick == iPlayTimeInTicks => play the event
             for(int i=0; i<this.trackEventsCurrentIndexes.length; i++){
                 Track track = this.tracks[i];
-                while( true ){
+                while( ! this.stopped ){
                     int currentEventIndex = trackEventsCurrentIndexes[i];
                     if(currentEventIndex < track.size() && i < 300){
                         MidiEvent event = track.get(currentEventIndex);

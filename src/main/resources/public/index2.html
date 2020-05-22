@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>jQuery UI Button - Default functionality</title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <script>
+  $( function() {
+        $( ".widget input[type=submit], .widget a, .widget button" ).button();
+
+        var slider = $( "#slider" ).slider({
+            range: false,
+            min: 0,
+            max: 500,
+            values: [75],
+            slide: function( event, ui ) {
+                $( "#amount" ).val( "$" + ui.values[ 0 ] );
+            }
+        });
+        $("#slider").slider('value', 450);
+
+        /*
+        $( "button, input, a" ).click( function( event ) {
+             event.preventDefault();
+             //alert($(slider).val());
+             //slider.slider('value', 10);
+             $.get( "http://localhost:8080/sequencer/test", function( data ) {
+                  alert( data );
+             });
+        } );
+        */
+        $( "#play" ).click( function( event ) {
+             $.get( "/sequencer/play", function( data ) {
+                  alert( data );
+             });
+        } );
+        $( "#stop" ).click( function( event ) {
+             $.get( "/sequencer/stop", function( data ) {
+                  alert( data );
+             });
+        } );
+        $( "#resume" ).click( function( event ) {
+             $.get( "/sequencer/resume", function( data ) {
+                  alert( data );
+             });
+        } );
+
+
+  } );
+  </script>
+</head>
+<body>
+<div class="widget">
+    <h1>Sequencer Widget Buttons</h1>
+    <button id="play">Play</button>
+    <button id="resume">Resume</button>
+    <button id="stop">Stop</button>
+    <!--
+    <input type="submit" value="A submit button">
+    <a href="#">An anchor</a>
+    -->
+</div>
+</br></br></br>
+<div id="slider"></div>
+
+<p>
+    <label for="amount">Price range:</label>
+    <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+</p>
+
+<!--
+<h1>CSS Buttons</h1>
+<button class="ui-button ui-widget ui-corner-all">A button element</button>
+
+<input class="ui-button ui-widget ui-corner-all" type="submit" value="A submit button">
+
+<a class="ui-button ui-widget ui-corner-all" href="#">An anchor</a>
+-->
+
+</body>
+</html>

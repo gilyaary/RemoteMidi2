@@ -67,7 +67,7 @@ public class SequencerController {
     @GetMapping("/sequencer/resume")
     @RequestMapping(value = "/sequencer/resume", method = RequestMethod.GET)
     public String resume() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
-        sequencer.resume();
+        sequencer.start();
         return "resumed";
     }
 
