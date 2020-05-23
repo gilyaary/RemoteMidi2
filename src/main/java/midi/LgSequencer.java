@@ -1,5 +1,11 @@
 package midi;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import tcp.client.RtMidiConnection;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.sound.midi.*;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,6 +13,7 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+@Component
 public class LgSequencer implements Sequencer {
 
     private Sequence sequence;
@@ -17,6 +24,23 @@ public class LgSequencer implements Sequencer {
     private float bpm = 60;
     private boolean running;
 
+    @Autowired
+    private RtMidiConnection midiConnection;
+
+    @PostConstruct
+    public void init() throws Exception {
+        this.open();
+        this.midiConnection.init();
+    }
+
+    @PreDestroy
+    public void cleanup(){
+        this.close();
+        this.midiConnection.close();
+    }
+
+
+    //should only happen once in the sequencer lifetime
     private void initialize(){
         sequencerRunnable.setBpm(this.bpm);
         sequencerThread = new Thread(sequencerRunnable);
@@ -32,6 +56,7 @@ public class LgSequencer implements Sequencer {
     public void setSequence(Sequence sequence){
         this.sequence = sequence;
         this.sequencerRunnable.setSequence(sequence);
+        this.songPositionMs = 0;
     }
 
     @Override
@@ -74,7 +99,7 @@ public class LgSequencer implements Sequencer {
     @Override
     public void stop() {
         if(this.sequence != null){
-            //a mutex is a Semaphor that allows only one thread at a time to access a protected method
+            //a mutex is a Semaphore that allows only one thread at a time to access a protected method
             if(sequencePlayerSemaphore.availablePermits() > 0) {
                 try {
                     sequencePlayerSemaphore.tryAcquire(10, TimeUnit.MILLISECONDS);
@@ -187,7 +212,7 @@ public class LgSequencer implements Sequencer {
 
     @Override
     public void setTickPosition(long tick) {
-
+        //todo: let the runnable handle this
     }
 
     @Override
@@ -253,7 +278,8 @@ public class LgSequencer implements Sequencer {
 
     @Override
     public void setMicrosecondPosition(long microseconds) {
-
+        this.songPositionMs = microseconds/1000;
+        //let the runnable handle this
     }
 
     @Override
@@ -355,4 +381,5 @@ public class LgSequencer implements Sequencer {
     public int getLoopCount() {
         return 0;
     }
+
 }

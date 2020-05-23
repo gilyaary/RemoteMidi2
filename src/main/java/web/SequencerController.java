@@ -2,15 +2,9 @@ package web;
 
 import midi.LgSequencer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import tcp.client.RtMidiClient;
+import org.springframework.web.bind.annotation.*;
 import tcp.client.RtMidiConnection;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
@@ -21,23 +15,11 @@ import java.io.IOException;
 @RestController
 public class SequencerController {
 
+    @Autowired
     private LgSequencer sequencer;
 
     @Autowired
     private RtMidiConnection midiConnection;
-
-    @PostConstruct
-    public void init() throws Exception {
-        this.sequencer = new LgSequencer();
-        this.sequencer.open();
-        this.midiConnection.init();
-    }
-
-    @PreDestroy
-    public void cleanup(){
-        this.sequencer.close();
-        this.midiConnection.close();
-    }
 
     @GetMapping("/sequencer")
     @RequestMapping(value = "/sequencer", method = RequestMethod.GET)
@@ -52,60 +34,54 @@ public class SequencerController {
         return response;
     }
 
-    @GetMapping("/sequencer/play")
-    @RequestMapping(value = "/sequencer/play", method = RequestMethod.GET)
+    @PutMapping("/sequencer/play")
+    @RequestMapping(value = "/sequencer/play", method = RequestMethod.PUT)
     public String play() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
         String midi_file = "/home/gil/Music/gil_music.mid";
         Sequence sequence = MidiSystem.getSequence(new File(midi_file));
         sequencer.setSequence(sequence);
         sequencer.setTempoInBPM(160);
-        long time = System.currentTimeMillis();
+        sequencer.setMicrosecondPosition(0);
         sequencer.start();
         return "started";
     }
 
-    @GetMapping("/sequencer/resume")
-    @RequestMapping(value = "/sequencer/resume", method = RequestMethod.GET)
+    @PutMapping("/sequencer/resume")
+    @RequestMapping(value = "/sequencer/resume", method = RequestMethod.PUT)
     public String resume() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
         sequencer.start();
         return "resumed";
     }
 
-    @GetMapping("/sequencer/stop")
-    @RequestMapping(value = "/sequencer/stop", method = RequestMethod.GET)
+    @PutMapping("/sequencer/stop")
+    @RequestMapping(value = "/sequencer/stop", method = RequestMethod.PUT)
     public String stop() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
         sequencer.stop();
         return "stopped";
     }
 
+    //Ping it
     @GetMapping("/sequencer/test")
     @RequestMapping(value = "/sequencer/test", method = RequestMethod.GET)
-    public String test() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
+    public String isAlive() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
 
-        return "TEST by gil";
+        return "Alive";
     }
 
-    @GetMapping("/sequencer/test2")
-    @RequestMapping(value = "/sequencer/test2", method = RequestMethod.GET)
-    public String test2() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
-
-        return "TEST2 Hahaha by gil";
+    @GetMapping("/sequencer/position")
+    @RequestMapping(value = "/sequencer/position", method = RequestMethod.GET)
+    public Long getPosition() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
+        return sequencer.getMicrosecondPosition();
     }
 
-
-    public static void main(String[] args) throws Exception {
-        SequencerController sc = new SequencerController();
-        sc.midiConnection = new RtMidiConnection();
-        sc.init();
-
-
-        //call tested methods
-        //String ports = sc.ports(); System.out.print(ports);
-        sc.play();
-
-
-        sc.cleanup();
+    @PutMapping("/sequencer/position")
+    @RequestMapping(value = "/sequencer/position", method = RequestMethod.PUT)
+    public void setPosition(@RequestParam Long position) throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
+        sequencer.setMicrosecondPosition(position);
     }
-
-
 }
+
+//TODO:
+//1. Correctly start the sequencer
+//2. set position
+//3. get position

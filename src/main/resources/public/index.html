@@ -18,74 +18,20 @@
 
 
 
-    <script>
-  $( function() {
-        var app = new Vue({
-              el: '#app',
-              data: {
-                  message: 'Hello Vue!'
-              },
-              methods: {
-                  displayMessage: function(msg){this.message = msg;}
-              }
-        });
-
-        $( ".widget input[type=submit], .widget a, .widget button" ).button();
-
-        $( "#play" ).click( function( event ) {
-             $.get( "/sequencer/play", function( data ) {
-                  //alert( data );
-             });
-        } );
-        $( "#stop" ).click( function( event ) {
-             $.get( "/sequencer/stop", function( data ) {
-                  //alert( data );
-             });
-        } );
-        $( "#resume" ).click( function( event ) {
-             $.get( "/sequencer/resume", function( data ) {
-                  //alert( data );
-             });
-        } );
-
-        var slider = $( "#slider" ).slider({
-            range: "min",
-            min: 0,
-            max: 500,
-            value: 75,
-            slide: function( event, ui ) {
-                //$( "#amount" ).val( "$" + ui.value  );
-            }
-        });
-
-
-        var call_num = 1;
-        ws = new WebSocket('ws://localhost:8080/song_status');
-        ws.onmessage = function(data) {
-            //app.displayMessage(data.data);
-            var value = data.data.substring(15);
-            app.displayMessage(value);
-            slider.slider( "value", value );
-        }
-
-  } );
-  </script>
+    <script src="scripts/player_control.js"></script>
 </head>
 <body>
 <div class="widget">
     <h1>Sequencer Widget Buttons</h1>
     <button id="play">Play</button>
     <button id="stop">Stop</button>
+    <button id="info">Info</button>
 </div>
 </br></br></br>
 
-
-<!--div class="slidecontainer">
-    <input type="range" min="1" max="100" value="50" id="slider" id="myRange">
-</div-->
 <div id="slider"></div>
 
-<div id="app">
+<div id="player_control_app">
     <p>Position:</p>
     {{message}}
 </div>
