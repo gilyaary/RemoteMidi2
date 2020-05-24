@@ -1,6 +1,8 @@
 package web.wesocket;
 
+import midi.LgSequencer;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 
@@ -9,14 +11,21 @@ import java.io.IOException;
 @Component
 public class SongStatusHandler implements WebSocketHandler{
 
+    @Autowired
+    LgSequencer lgSequencer;
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         int seq = 0;
         while(session.isOpen()){
             try {
-                WebSocketMessage<?> msm = new TextMessage("Message Number " + seq++);
-                session.sendMessage(msm);
-                Thread.sleep(1000);
+                if(lgSequencer != null) {
+                    long position = lgSequencer.getMicrosecondPosition();
+                    String msg = Long.toString(position);
+                    WebSocketMessage<?> msm = new TextMessage(msg);
+                    session.sendMessage(msm);
+                    Thread.sleep(100);
+                }
             }catch(Exception e){
                 e.printStackTrace();
             }

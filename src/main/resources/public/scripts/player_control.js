@@ -2,10 +2,12 @@
         var player_control_app = new Vue({
               el: '#player_control_app',
               data: {
-                  message: 'Hello Vue!'
+                  song_position: 0,
+                  midi_devices: ''
               },
               methods: {
-                  displayMessage: function(msg){this.message = msg;}
+                  songPosition: function(msg){this.song_position = msg;},
+                  midiDevices: function(msg){this.midi_devices = msg;}
               }
         });
 
@@ -31,7 +33,8 @@
         } );
         $( "#info" ).click( function( event ) {
              $.get( "/sequencer/ports", function( data ) {
-                  alert( data );
+                  //alert( data );
+                  player_control_app.midiDevices(data);
              });
         } );
         function put(url, data, cb){
@@ -57,11 +60,10 @@
         });
 
 
-        var call_num = 1;
         ws = new WebSocket('ws://localhost:8080/song_status');
         ws.onmessage = function(data) {
-            var value = data.data.substring(15);
-            player_control_app.displayMessage(value);
+            var value = parseInt(data.data, 10) / 1000000;
+            player_control_app.songPosition(value);
             slider.slider( "value", value );
         }
 
