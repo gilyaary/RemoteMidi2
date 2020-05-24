@@ -277,8 +277,9 @@ public class LgSequencer implements Sequencer {
     }
 
     @Override
-    public void setMicrosecondPosition(long microseconds) {
-        this.songPositionMs = microseconds/1000;
+    public void setMicrosecondPosition(long seconds) {
+        this.songPositionMs = seconds * 1000;
+        this.sequencerRunnable.setSongPositionMs(this.songPositionMs);
         //let the runnable handle this
     }
 

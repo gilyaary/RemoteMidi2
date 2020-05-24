@@ -3,11 +3,19 @@
               el: '#player_control_app',
               data: {
                   song_position: 0,
-                  midi_devices: ''
+                  midi_devices: '',
+                  status: 'STOP'
               },
               methods: {
-                  songPosition: function(msg){this.song_position = msg;},
-                  midiDevices: function(msg){this.midi_devices = msg;}
+                  setSongPosition: function(msg){
+                        this.song_position = msg;
+                  },
+                  setMidiDevices: function(msg){
+                        this.midi_devices = msg;
+                  },
+                  setStatus: function(msg){
+                        this.status = msg;
+                  },
               }
         });
 
@@ -19,24 +27,28 @@
              put( url, {}, function( data ) {
                   //alert( data );
                   loaded = 1
+                  player_control_app.setStatus('PLAY');
              });
         } );
         $( "#stop" ).click( function( event ) {
              put( "/sequencer/stop", {}, function( data ) {
                   //alert( data );
+                  player_control_app.setStatus('STOP');
              });
         } );
         $( "#resume" ).click( function( event ) {
              put( "/sequencer/resume", {}, function( data ) {
                   //alert( data );
+                  player_control_app.setStatus('PLAY');
              });
         } );
         $( "#info" ).click( function( event ) {
              $.get( "/sequencer/ports", function( data ) {
                   //alert( data );
-                  player_control_app.midiDevices(data);
+                  player_control_app.setMidiDevices(data);
              });
         } );
+
         function put(url, data, cb){
             $.ajax({
               url: url,
@@ -52,19 +64,27 @@
         var slider = $( "#slider" ).slider({
             range: "min",
             min: 0,
-            max: 500,
-            value: 75,
+            max: 300,
+            value: 0,
             slide: function( event, ui ) {
                 //$( "#amount" ).val( "$" + ui.value  );
+                if(player_control_app.status == 'STOP'){
+                    put( "/sequencer/position", {'position': ui.value}, function( data ) {
+                          //alert( data );
+                          player_control_app.setSongPosition(ui.value);
+                    });
+                }
             }
         });
 
 
         ws = new WebSocket('ws://localhost:8080/song_status');
         ws.onmessage = function(data) {
-            var value = parseInt(data.data, 10) / 1000000;
-            player_control_app.songPosition(value);
-            slider.slider( "value", value );
+            if(player_control_app.status == 'PLAY'){
+                var value = parseInt(data.data, 10) / 1000000;
+                player_control_app.setSongPosition(value);
+                slider.slider( "value", value );
+            }
         }
 
   } );

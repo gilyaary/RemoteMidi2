@@ -18,10 +18,6 @@ public class SequencerRunnable implements Runnable{
     RtMidiClient rtMidiClient = new RtMidiClient();
 
 
-    public void setBpm(float tempoInBPM) {
-        this.beatsPerMinute = tempoInBPM;
-    }
-
     enum MODE {PLAYBACK, RECORD}
     MODE mode;
     //long positionFromStart = 0;
@@ -118,6 +114,9 @@ public class SequencerRunnable implements Runnable{
 
     private void playEvents() {
         try {
+
+
+            //TODO: Pack all this info into one object. Also create a method that does these calcualtions
             long lengthMs = this.sequence.getMicrosecondLength();
             float divisionType = this.sequence.getDivisionType();
             int resolution = this.sequence.getResolution();
@@ -128,6 +127,8 @@ public class SequencerRunnable implements Runnable{
             double singleTickTime = 1.00 / ticksPerSecond;
             double playTimeInTicks = (songPositionMs/1000.00) / singleTickTime;
             long iPlayTimeInTicks = Math.round(playTimeInTicks);
+
+
             //System.out.printf("Time(ticks): %s%n", iPlayTimeInTicks);
             //System.out.printf("Time(Ticks) %s%n", iPlayTimeInTicks);
             //TODO: Now check which events should be played
@@ -168,5 +169,40 @@ public class SequencerRunnable implements Runnable{
         //if no more ticks then change the status to stopped
     }
 
+    public void setBpm(float tempoInBPM) {
+        this.beatsPerMinute = tempoInBPM;
+    }
+
+    public void setSongPositionMs(long songPositionMs) {
+        this.songPositionMs = songPositionMs;
+        //TODO: Pack all this info into one object. Also create a method that does these calcualtions
+        if(this.sequence != null) {
+            long lengthMs = this.sequence.getMicrosecondLength();
+            float divisionType = this.sequence.getDivisionType();
+            int resolution = this.sequence.getResolution();
+            long tickLength = this.sequence.getTickLength();
+            this.tracks = this.sequence.getTracks();
+            double beatsPerSecond = (double) (beatsPerMinute) / 60.00;
+            double ticksPerSecond = beatsPerSecond * resolution; //resolution is how many ticks we have in a single beat
+            double singleTickTime = 1.00 / ticksPerSecond;
+            double playTimeInTicks = (songPositionMs / 1000.00) / singleTickTime;
+            long iPlayTimeInTicks = Math.round(playTimeInTicks);
+
+
+            for (int i = 0; i < this.trackEventsCurrentIndexes.length; i++) {
+                this.trackEventsCurrentIndexes[i] = 0;
+                Track track = this.tracks[i];
+                for (int j = 1; j < track.size(); j++) {
+                    MidiEvent event = track.get(j);
+                    long tick = event.getTick();
+                    if (tick <= iPlayTimeInTicks) {
+                        this.trackEventsCurrentIndexes[i] = j;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
 }
