@@ -9,12 +9,15 @@ import javax.annotation.PreDestroy;
 import javax.sound.midi.*;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 @Component
 public class LgSequencer implements Sequencer {
+
+
 
     private Sequence sequence;
     Semaphore sequencePlayerSemaphore = new Semaphore(1);
@@ -26,6 +29,7 @@ public class LgSequencer implements Sequencer {
 
     @Autowired
     private RtMidiConnection midiConnection;
+    private List<Receiver> receivers = new ArrayList<>();
 
     @PostConstruct
     public void init() throws Exception {
@@ -52,9 +56,14 @@ public class LgSequencer implements Sequencer {
         sequencerRunnable.exit();
     }
 
+    //We want to wrap the sequence class and its embedded tracks in our own
+    //when we save we want to save as own own sequence class
+    //This should be backward compatible. So generic formats could be read and wrapped with our
+    //special classes.
+    //Not doing so would mean that we are saving the info related to each track in a different file
     @Override
     public void setSequence(Sequence sequence){
-        this.sequence = sequence;
+        //this.sequence = sequence;
         this.sequencerRunnable.setSequence(sequence);
         this.songPositionMs = 0;
     }
@@ -66,8 +75,19 @@ public class LgSequencer implements Sequencer {
 
     @Override
     public Sequence getSequence() {
+        /*
+        Track[] tracks = sequence.getTracks();
+        for(Track t : tracks){
+            //record and event
+            t.add(ev);
+            //remove an event
+            t.remove(ev);
+            Track tt = sequence.createTrack();
+        }
+        */
         return sequence;
     }
+
 
     /*
         MidiUtils:
@@ -256,15 +276,28 @@ public class LgSequencer implements Sequencer {
         return 0;
     }
 
+
+
+
     @Override
     public Receiver getReceiver() throws MidiUnavailableException {
-        return null;
+        //this should create a new receiver through which we send NEW midi events to the sequencer.
+        //The sequencer should add these new events to their tracks
+        LgSequencerReceiver receiver = new LgSequencerReceiver();
+        this.receivers.add(receiver);
+        return receiver;
     }
 
     @Override
     public List<Receiver> getReceivers() {
-        return null;
+        return this.receivers;
     }
+
+
+
+
+
+
 
     @Override
     public Transmitter getTransmitter() throws MidiUnavailableException {

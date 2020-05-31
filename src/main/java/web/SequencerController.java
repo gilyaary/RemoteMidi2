@@ -1,6 +1,8 @@
 package web;
 
 import midi.LgSequencer;
+import midi.LgSequencerManager;
+import midi.TrackInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import tcp.client.RtMidiConnection;
@@ -16,7 +18,7 @@ import java.io.IOException;
 public class SequencerController {
 
     @Autowired
-    private LgSequencer sequencer;
+    private LgSequencerManager sequencerManager;
 
     @Autowired
     private RtMidiConnection midiConnection;
@@ -38,25 +40,24 @@ public class SequencerController {
     @RequestMapping(value = "/sequencer/play", method = RequestMethod.PUT)
     public String play() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
         String midi_file = "/home/gil/Music/gil_music.mid";
-        Sequence sequence = MidiSystem.getSequence(new File(midi_file));
-        sequencer.setSequence(sequence);
-        sequencer.setTempoInBPM(160);
-        sequencer.setMicrosecondPosition(0);
-        sequencer.start();
+        sequencerManager.loadSequenceFromFileSystem(midi_file);
+        sequencerManager.setTempoInBPM(160);
+        sequencerManager.setMicrosecondPosition(0);
+        sequencerManager.start();
         return "started";
     }
 
     @PutMapping("/sequencer/resume")
     @RequestMapping(value = "/sequencer/resume", method = RequestMethod.PUT)
     public String resume() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
-        sequencer.start();
+        sequencerManager.start();
         return "resumed";
     }
 
     @PutMapping("/sequencer/stop")
     @RequestMapping(value = "/sequencer/stop", method = RequestMethod.PUT)
     public String stop() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
-        sequencer.stop();
+        sequencerManager.stop();
         return "stopped";
     }
 
@@ -71,17 +72,38 @@ public class SequencerController {
     @GetMapping("/sequencer/position")
     @RequestMapping(value = "/sequencer/position", method = RequestMethod.GET)
     public Long getPosition() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
-        return sequencer.getMicrosecondPosition();
+        return sequencerManager.getMicrosecondPosition();
     }
 
     @PutMapping("/sequencer/position")
     @RequestMapping(value = "/sequencer/position", method = RequestMethod.PUT)
-    public void setPosition(@RequestParam Long position) throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
-        sequencer.setMicrosecondPosition(position);
+    public void setPosition(@RequestParam Integer position) throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
+        sequencerManager.setMicrosecondPosition(position);
+    }
+
+    @PostMapping("/sequencer/track")
+    @RequestMapping(value = "/sequencer/track", method = RequestMethod.POST)
+    public TrackInfo createTrack(@RequestParam String name) {
+        return sequencerManager.createTrack(name);
+    }
+
+    @PostMapping("/sequencer/track")
+    @RequestMapping(value = "/sequencer/track", method = RequestMethod.POST)
+    public TrackInfo deleteTrack(@RequestParam Integer trackInfoId) {
+        return sequencerManager.deleteTrack(trackInfoId);
     }
 }
 
 //TODO:
-//1. Correctly start the sequencer
-//2. set position
-//3. get position
+/*
+1. Correctly start the sequencer: done
+2. set position: done
+3. get position: done
+4. View MIDI files anywhere on the file system, possibly on the network, Open MIDI file
+5. View the played MIDI score(Simple file transfer)
+6  Clips: What is it exactly? We need to be able to define clips and edit them
+7. Add/Remove Track
+8. Record
+9. Change Device and Channel (MIDI message)
+
+ */

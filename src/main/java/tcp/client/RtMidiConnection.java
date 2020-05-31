@@ -49,8 +49,10 @@ public class RtMidiConnection {
 
             String cmdString = cmd.toString();
             try {
-                out.write(cmdString.getBytes());
-                out.flush();
+                if ( out !=null ) {
+                    out.write(cmdString.getBytes());
+                    out.flush();
+                }
                 System.out.println(cmdString);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -64,19 +66,21 @@ public class RtMidiConnection {
         cmd.append("@QQQ");
         String cmdString = cmd.toString();
         try {
-            out.write(cmdString.getBytes());
-            out.flush();
-            //System.out.println(cmdString);
-            BufferedReader br = new BufferedReader(reader);
-            StringBuffer lines = new StringBuffer();
-            while(true) {
-                String response = br.readLine();
-                if(response == null || response.equals("@@@")){
-                    return lines.toString();
-                }
-                else{
-                    lines.append(response);
-                    lines.append("\n");int i=9;
+            if(out !=null) {
+                out.write(cmdString.getBytes());
+                out.flush();
+                //System.out.println(cmdString);
+                BufferedReader br = new BufferedReader(reader);
+                StringBuffer lines = new StringBuffer();
+                while (true) {
+                    String response = br.readLine();
+                    if (response == null || response.equals("@@@")) {
+                        return lines.toString();
+                    } else {
+                        lines.append(response);
+                        lines.append("\n");
+                        int i = 9;
+                    }
                 }
             }
         } catch (Exception e) {
