@@ -18,8 +18,9 @@ import java.util.concurrent.TimeUnit;
 public class LgSequencer implements Sequencer {
 
 
+    @Autowired
+    SequencerContext sequencerContext;
 
-    private Sequence sequence;
     Semaphore sequencePlayerSemaphore = new Semaphore(1);
     SequencerRunnable sequencerRunnable = new SequencerRunnable();
     Thread sequencerThread = null;
@@ -64,7 +65,8 @@ public class LgSequencer implements Sequencer {
     @Override
     public void setSequence(Sequence sequence){
         //this.sequence = sequence;
-        this.sequencerRunnable.setSequence(sequence);
+        this.sequencerContext.sequence = sequence;
+        this.sequencerRunnable.initSequence();
         this.songPositionMs = 0;
     }
 
@@ -85,7 +87,7 @@ public class LgSequencer implements Sequencer {
             Track tt = sequence.createTrack();
         }
         */
-        return sequence;
+        return this.sequencerContext.sequence;
     }
 
 
@@ -100,7 +102,7 @@ public class LgSequencer implements Sequencer {
     @Override
     public void start() {
         this.running = true;
-        if(this.sequence != null){
+        if(this.sequencerContext.sequence != null){
             sequencerRunnable.setBpm(this.getTempoInBPM());
             if(sequencePlayerSemaphore.availablePermits() > 0) {
                 try {
@@ -118,7 +120,7 @@ public class LgSequencer implements Sequencer {
 
     @Override
     public void stop() {
-        if(this.sequence != null){
+        if(this.sequencerContext.sequence != null){
             //a mutex is a Semaphore that allows only one thread at a time to access a protected method
             if(sequencePlayerSemaphore.availablePermits() > 0) {
                 try {
@@ -142,7 +144,7 @@ public class LgSequencer implements Sequencer {
 
     @Override
     public void startRecording() {
-        if(this.sequence != null){
+        if(this.sequencerContext.sequence != null){
             //a mutex is a Semaphor that allows only one thread at a time to access a protected method
             if(sequencePlayerSemaphore.availablePermits() > 0) {
                 try {
@@ -159,7 +161,7 @@ public class LgSequencer implements Sequencer {
 
     @Override
     public void stopRecording() {
-        if(this.sequence != null){
+        if(this.sequencerContext.sequence != null){
             //a mutex is a Semaphor that allows only one thread at a time to access a protected method
             if(sequencePlayerSemaphore.availablePermits() > 0) {
                 try {

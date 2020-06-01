@@ -1,21 +1,23 @@
 package midi;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import tcp.client.RtMidiClient;
 
 import javax.sound.midi.*;
+import java.util.Map;
 
 public class SequencerRunnable implements Runnable{
 
-    private Sequence sequence;
     long songPositionMs = 0;
     private boolean exit;
     private boolean stopped = true;
-    private Track[] tracks;
     private float beatsPerMinute;
-    private int[] trackEventsCurrentIndexes;
     private Synthesizer synth;
-    private Receiver synthReceiver;
+    //private Receiver synthReceiver;
     RtMidiClient rtMidiClient = new RtMidiClient();
+
+    @Autowired
+    SequencerContext sequencerContext;
 
 
     enum MODE {PLAYBACK, RECORD}
@@ -24,11 +26,13 @@ public class SequencerRunnable implements Runnable{
 
     public SequencerRunnable(){}
 
-    public void setSequence(Sequence sequence){
-        this.sequence = sequence;
-        this.tracks = this.sequence.getTracks();
+    public void initSequence(){
 
-        for (Track track : this.tracks){
+        Map<Integer, TrackInfo> trackInfoMap = this.sequencerContext.trackInfoMap;
+
+        for (Integer trackId : trackInfoMap.keySet()){
+            TrackInfo trackInfo = trackInfoMap.get(trackId);
+            Track track = trackInfo.getTrack();
             int eventCount = track.size();
             for(int i=0; i<eventCount; i++){
                 MidiEvent ev = track.get(i);
@@ -37,8 +41,6 @@ public class SequencerRunnable implements Runnable{
                 //MidiUtils.tick2microsecond();
             }
         }
-
-        this.trackEventsCurrentIndexes = new int[tracks.length];
     }
 
     @Override
@@ -117,11 +119,10 @@ public class SequencerRunnable implements Runnable{
 
 
             //TODO: Pack all this info into one object. Also create a method that does these calcualtions
-            long lengthMs = this.sequence.getMicrosecondLength();
-            float divisionType = this.sequence.getDivisionType();
-            int resolution = this.sequence.getResolution();
-            long tickLength = this.sequence.getTickLength();
-            this.tracks = this.sequence.getTracks();
+            long lengthMs = this.sequencerContext.sequence.getMicrosecondLength();
+            float divisionType = this.sequencerContext.sequence.getDivisionType();
+            int resolution = this.sequencerContext.sequence.getResolution();
+            long tickLength = this.sequencerContext.sequence.getTickLength();
             double beatsPerSecond = (double)(beatsPerMinute) / 60.00;
             double ticksPerSecond = beatsPerSecond * resolution; //resolution is how many ticks we have in a single beat
             double singleTickTime = 1.00 / ticksPerSecond;
@@ -133,18 +134,22 @@ public class SequencerRunnable implements Runnable{
             //System.out.printf("Time(Ticks) %s%n", iPlayTimeInTicks);
             //TODO: Now check which events should be played
             //we use the tick for timing. When event_tick == iPlayTimeInTicks => play the event
-            for(int i=0; i<this.trackEventsCurrentIndexes.length; i++){
-                Track track = this.tracks[i];
+            Map<Integer, TrackInfo> trackInfoMap = this.sequencerContext.trackInfoMap;
+
+            for (Integer trackId : trackInfoMap.keySet()){
+                TrackInfo trackInfo = trackInfoMap.get(trackId);
+                Track track = trackInfo.getTrack();
+
                 while( ! this.stopped ){
-                    int currentEventIndex = trackEventsCurrentIndexes[i];
-                    if(currentEventIndex < track.size() && i < 300){
+                    int currentEventIndex = trackInfo.currentEventIndex;
+                    if(currentEventIndex < track.size() ){
                         MidiEvent event = track.get(currentEventIndex);
                         long tick = event.getTick();
                         if(tick <= iPlayTimeInTicks){
                             //play the event
                             //System.out.printf("Time(ticks): %s, Track: %s, Message: %s%n", iPlayTimeInTicks, i, event.getMessage().getMessage());
                             synthReceiver.send(event.getMessage(), 0);
-                            trackEventsCurrentIndexes[i]++;
+                            trackInfo.currentEventIndex++;
                         }
                         else{
                             break;
@@ -176,27 +181,27 @@ public class SequencerRunnable implements Runnable{
     public void setSongPositionMs(long songPositionMs) {
         this.songPositionMs = songPositionMs;
         //TODO: Pack all this info into one object. Also create a method that does these calcualtions
-        if(this.sequence != null) {
-            long lengthMs = this.sequence.getMicrosecondLength();
-            float divisionType = this.sequence.getDivisionType();
-            int resolution = this.sequence.getResolution();
-            long tickLength = this.sequence.getTickLength();
-            this.tracks = this.sequence.getTracks();
+        if(this.sequencerContext.sequence != null) {
+            long lengthMs = this.sequencerContext.sequence.getMicrosecondLength();
+            float divisionType = this.sequencerContext.sequence.getDivisionType();
+            int resolution = this.sequencerContext.sequence.getResolution();
+            long tickLength = this.sequencerContext.sequence.getTickLength();
             double beatsPerSecond = (double) (beatsPerMinute) / 60.00;
             double ticksPerSecond = beatsPerSecond * resolution; //resolution is how many ticks we have in a single beat
             double singleTickTime = 1.00 / ticksPerSecond;
             double playTimeInTicks = (songPositionMs / 1000.00) / singleTickTime;
             long iPlayTimeInTicks = Math.round(playTimeInTicks);
 
+            Map<Integer, TrackInfo> trackInfoMap = this.sequencerContext.trackInfoMap;
 
-            for (int i = 0; i < this.trackEventsCurrentIndexes.length; i++) {
-                this.trackEventsCurrentIndexes[i] = 0;
-                Track track = this.tracks[i];
+            for (Integer trackId : trackInfoMap.keySet()){
+                TrackInfo trackInfo = trackInfoMap.get(trackId);
+                Track track = trackInfo.getTrack();
                 for (int j = 1; j < track.size(); j++) {
                     MidiEvent event = track.get(j);
                     long tick = event.getTick();
                     if (tick <= iPlayTimeInTicks) {
-                        this.trackEventsCurrentIndexes[i] = j;
+                        trackInfo.currentEventIndex = j;
                     } else {
                         break;
                     }

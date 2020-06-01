@@ -17,24 +17,28 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 public class LgSequencerManager {
 
-
     @Autowired
     private LgSequencer sequencer;
 
     @Autowired
     private RtMidiConnection midiConnection;
 
-    Map<Integer, TrackInfo> trackInfoMap = new HashMap<>();
-    AtomicInteger trackInfoIdGen = new AtomicInteger(1);
+    @Autowired
+    SequencerContext sequencerContext;
+
+    //TODO:we need more than one receiver. And eachreceiver should have an ID
+    //Each receiver is associated with a keyboard ot another available controller
+    //controllers can also include software and hardware. Drum sequencer, software or hardware patch controller etc etc.
+    private LgMidiReceiver lgMidiReceiver;
 
 
     public TrackInfo createTrack(String name) {
         if(sequencer != null && sequencer.getSequence() != null) {
             Track track = sequencer.getSequence().createTrack();
-            Integer trackInfoId = this.trackInfoIdGen.getAndIncrement();
+            Integer trackInfoId = sequencerContext.trackInfoIdGen.getAndIncrement();
             TrackInfo trackInfo = new TrackInfo(trackInfoId, track);
             trackInfo.setName(name);
-            this.trackInfoMap.put(trackInfoId, trackInfo);
+            sequencerContext.trackInfoMap.put(trackInfoId, trackInfo);
             return trackInfo;
         }
         return null;
@@ -42,11 +46,11 @@ public class LgSequencerManager {
 
     public TrackInfo deleteTrack(Integer trackInfoId) {
         if(sequencer != null && sequencer.getSequence() != null) {
-            TrackInfo trackInfo = this.trackInfoMap.get(trackInfoId);
+            TrackInfo trackInfo = sequencerContext.trackInfoMap.get(trackInfoId);
             if(trackInfo != null) {
                 boolean deleted = sequencer.getSequence().deleteTrack(trackInfo.getTrack());
                 if (deleted) {
-                    this.trackInfoMap.remove(trackInfo);
+                    sequencerContext.trackInfoMap.remove(trackInfo);
                 }
                 return trackInfo;
             }
@@ -59,16 +63,16 @@ public class LgSequencerManager {
     For now just setting default names etc.
      */
     public void loadSequenceFromFileSystem(String midi_file) throws InvalidMidiDataException, IOException {
-        Sequence sequence = MidiSystem.getSequence(new File(midi_file));
-        this.sequencer.setSequence(sequence);
-        this.trackInfoMap.clear();
-        trackInfoIdGen.set(1);
-        for (Track track : sequence.getTracks()){
-            Integer trackInfoId = this.trackInfoIdGen.getAndIncrement();
+        sequencerContext.sequence = MidiSystem.getSequence(new File(midi_file));
+        this.sequencer.setSequence(this.sequencerContext.sequence);
+        sequencerContext.trackInfoMap.clear();
+        sequencerContext.trackInfoIdGen.set(1);
+        for (Track track : this.sequencerContext.sequence.getTracks()){
+            Integer trackInfoId = sequencerContext.trackInfoIdGen.getAndIncrement();
             TrackInfo trackInfo = new TrackInfo(trackInfoId, track);
             //set a default name
             trackInfo.setName(String.format("Track %s", trackInfoId));
-            this.trackInfoMap.put(trackInfoId, trackInfo);
+            sequencerContext.trackInfoMap.put(trackInfoId, trackInfo);
         }
     }
 
@@ -91,6 +95,29 @@ public class LgSequencerManager {
 
     public Long getMicrosecondPosition() {
         return this.sequencer.getMicrosecondPosition();
+    }
+
+
+
+
+
+
+
+
+    //TODO: We must implement all the methods below to be able to remord MIDI
+    //TODO: we need to have IDs for these ports
+    //Also we want to also list Java.midi input ports
+    public String getPorts() {
+        String response = this.midiConnection.sendCommand("1#@");
+        return response;
+    }
+    public void getInputDevicesFromJavaMidi(){
+
+    }
+    public void addPortToTrack(MidiPortInfo portInfo, Integer trackInfoId) throws MidiUnavailableException {
+        Transmitter transmitter = MidiSystem.getTransmitter();
+        transmitter.setReceiver(lgMidiReceiver);
+
     }
 
 

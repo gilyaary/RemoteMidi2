@@ -20,8 +20,7 @@ public class SequencerController {
     @Autowired
     private LgSequencerManager sequencerManager;
 
-    @Autowired
-    private RtMidiConnection midiConnection;
+
 
     @GetMapping("/sequencer")
     @RequestMapping(value = "/sequencer", method = RequestMethod.GET)
@@ -32,7 +31,7 @@ public class SequencerController {
     @GetMapping("/sequencer/ports")
     @RequestMapping(value = "/sequencer/ports", method = RequestMethod.GET)
     public String ports() {
-        String response = this.midiConnection.sendCommand("1#@");
+        String response = sequencerManager.getPorts();
         return response;
     }
 
@@ -92,6 +91,9 @@ public class SequencerController {
     public TrackInfo deleteTrack(@RequestParam Integer trackInfoId) {
         return sequencerManager.deleteTrack(trackInfoId);
     }
+
+
+
 }
 
 //TODO:
@@ -102,7 +104,7 @@ public class SequencerController {
 4. View MIDI files anywhere on the file system, possibly on the network, Open MIDI file
 5. View the played MIDI score(Simple file transfer)
 6  Clips: What is it exactly? We need to be able to define clips and edit them
-7. Add/Remove Track
+7. Add/Remove Track - Added
 8. Record
 9. Change Device and Channel (MIDI message)
 

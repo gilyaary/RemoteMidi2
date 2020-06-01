@@ -6,7 +6,10 @@ import java.util.List;
 public class TrackInfo {
     private final Track track;
     private final Integer id;
+    public int currentEventIndex;
     private String name;
+
+    private TrackStatus trackStatus = new TrackStatus();
 
     public List<MidiPortInfo> getInputPorts() {
         return inputPorts;
@@ -48,4 +51,9 @@ public class TrackInfo {
     public String getName(){
         return name;
     }
+
+    public TrackStatus getTrackStatus() {
+        return trackStatus;
+    }
+
 }

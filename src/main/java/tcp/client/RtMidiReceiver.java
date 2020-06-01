@@ -18,6 +18,16 @@ public class RtMidiReceiver implements Receiver {
     private InputStream in;
     private OutputStream out;
 
+    String commandRouting;
+    enum MidiInterface{ALSA, JACK};
+
+    public RtMidiReceiver(MidiInterface midiInterface, int portNumber){
+        //"2#A.1"
+        String commandPrefix = "2#";
+        String interfaceSymbol = midiInterface == MidiInterface.ALSA ? "A" : midiInterface == MidiInterface.JACK ? "J" : "A";
+        commandRouting = String.format("%s%s%s", commandPrefix, interfaceSymbol, portNumber);
+    }
+
     public void init() throws IOException {
         this.soc = new Socket("localhost", 8888);
         this.in = soc.getInputStream();
@@ -27,7 +37,7 @@ public class RtMidiReceiver implements Receiver {
     @Override
     public void send(MidiMessage midiMessage, long l) {
         try {
-            sendMessage(midiMessage, "2#A.1");
+            sendMessage(midiMessage, commandRouting);
         } catch (Exception e) {
             e.printStackTrace();
         }
