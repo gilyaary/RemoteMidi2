@@ -1,9 +1,10 @@
 package midi;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import tcp.client.RtMidiClient;
+import tcp.client.RtMidiTransmitter;
 
 import javax.sound.midi.*;
+import java.util.List;
 import java.util.Map;
 
 public class SequencerRunnable implements Runnable{
@@ -13,10 +14,7 @@ public class SequencerRunnable implements Runnable{
     private boolean stopped = true;
     private float beatsPerMinute;
     private Synthesizer synth;
-    //private Receiver synthReceiver;
-    RtMidiClient rtMidiClient = new RtMidiClient();
 
-    @Autowired
     SequencerContext sequencerContext;
 
 
@@ -33,6 +31,8 @@ public class SequencerRunnable implements Runnable{
         for (Integer trackId : trackInfoMap.keySet()){
             TrackInfo trackInfo = trackInfoMap.get(trackId);
             Track track = trackInfo.getTrack();
+            trackInfo.getInputPorts().add(new MidiPortInfo(MidiPortInfo.PortType.INPUT, 0, "DefaultInputPort"));
+            trackInfo.getOutputPorts().add(new MidiPortInfo(MidiPortInfo.PortType.OUTPUT, 0, "DefaultOutputPort"));
             int eventCount = track.size();
             for(int i=0; i<eventCount; i++){
                 MidiEvent ev = track.get(i);
@@ -51,11 +51,6 @@ public class SequencerRunnable implements Runnable{
             //TODO: we want to create our own receiver
             this.synth = MidiSystem.getSynthesizer();
             this.synth.open();
-
-
-            this.synthReceiver = rtMidiClient.getReceiver();
-            //this.synthReceiver = synth.getReceiver();
-
         } catch (MidiUnavailableException e) {
             e.printStackTrace();
         }
@@ -79,9 +74,9 @@ public class SequencerRunnable implements Runnable{
     }
 
     public void exit() {
-        if(this.synthReceiver != null) {
-            this.synthReceiver.close();
-        }
+//        if(this.synthReceiver != null) {
+//            this.synthReceiver.close();
+//        }
         if(this.synth != null) {
             this.synth.close();
         }
@@ -148,7 +143,14 @@ public class SequencerRunnable implements Runnable{
                         if(tick <= iPlayTimeInTicks){
                             //play the event
                             //System.out.printf("Time(ticks): %s, Track: %s, Message: %s%n", iPlayTimeInTicks, i, event.getMessage().getMessage());
-                            synthReceiver.send(event.getMessage(), 0);
+                            List<MidiPortInfo> outputs = trackInfo.getOutputPorts();
+                            for(MidiPortInfo port : outputs) {
+                                Integer portId = port.portId;
+                                RtMidiTransmitter tx = this.sequencerContext.transmitterMap.get(portId);
+                                if(tx != null) {
+                                    tx.send(event.getMessage(), 0);
+                                }
+                            }
                             trackInfo.currentEventIndex++;
                         }
                         else{

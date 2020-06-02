@@ -1,6 +1,7 @@
 package midi;
 
 import javax.sound.midi.Track;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TrackInfo {
@@ -30,8 +31,8 @@ public class TrackInfo {
     //we can have some config sepecific info here
     //for example what device (Port) is associated with this track
     //this may be for a duration of a runtime or maybe saved to a file in the future
-    List<MidiPortInfo> inputPorts;
-    List<MidiPortInfo> outputPorts;
+    List<MidiPortInfo> inputPorts = new ArrayList();
+    List<MidiPortInfo> outputPorts = new ArrayList();
 
     public TrackInfo(Integer id, Track track) {
         this.track = track;

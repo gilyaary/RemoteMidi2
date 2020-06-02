@@ -35,6 +35,7 @@ public class LgSequencer implements Sequencer {
     @PostConstruct
     public void init() throws Exception {
         this.open();
+        //TODO: this is a connection to a single local machine. We may want to connect to multiple cards (machines)
         this.midiConnection.init();
     }
 
@@ -48,6 +49,7 @@ public class LgSequencer implements Sequencer {
     //should only happen once in the sequencer lifetime
     private void initialize(){
         sequencerRunnable.setBpm(this.bpm);
+        sequencerRunnable.sequencerContext = sequencerContext;
         sequencerThread = new Thread(sequencerRunnable);
         sequencerThread.start();
     }

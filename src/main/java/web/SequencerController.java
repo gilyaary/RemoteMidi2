@@ -87,7 +87,7 @@ public class SequencerController {
     }
 
     @PostMapping("/sequencer/track")
-    @RequestMapping(value = "/sequencer/track", method = RequestMethod.POST)
+    @RequestMapping(value = "/sequencer/track", method = RequestMethod.DELETE)
     public TrackInfo deleteTrack(@RequestParam Integer trackInfoId) {
         return sequencerManager.deleteTrack(trackInfoId);
     }
