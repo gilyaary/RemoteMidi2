@@ -36,7 +36,12 @@ public class LgSequencer implements Sequencer {
     public void init() throws Exception {
         this.open();
         //TODO: this is a connection to a single local machine. We may want to connect to multiple cards (machines)
-        this.midiConnection.init();
+        try {
+            this.midiConnection.init();
+        }catch(Exception ex){
+            System.out.println("Could not connect to RTServer");
+            //TODO: update sequencer status to not connected
+        }
     }
 
     @PreDestroy

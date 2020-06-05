@@ -3,7 +3,6 @@ package tcp.client;
 import org.springframework.stereotype.Component;
 
 import javax.sound.midi.MidiMessage;
-import javax.sound.midi.Receiver;
 import java.io.*;
 import java.net.Socket;
 
@@ -22,7 +21,7 @@ public class RtMidiConnection {
         this.reader = new InputStreamReader(in);
     }
 
-    public void sendMidiMessage(MidiMessage midiMessage, long l) {
+    public synchronized void sendMidiMessage(MidiMessage midiMessage, long l) {
         try {
             sendMidiMessage(midiMessage, "2#A.1");
         } catch (Exception e) {
@@ -53,9 +52,12 @@ public class RtMidiConnection {
                     out.write(cmdString.getBytes());
                     out.flush();
                 }
+                else{
+                    reconnect();
+                }
                 System.out.println(cmdString);
             } catch (Exception e) {
-                e.printStackTrace();
+                reconnect();
             }
         }
     }
@@ -84,7 +86,7 @@ public class RtMidiConnection {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            reconnect();
         }
         return "";
     }
@@ -92,19 +94,32 @@ public class RtMidiConnection {
 
     public void close() {
         try {
-            this.in.close();
+            if(in != null)
+                this.in.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
         try {
-            this.out.close();
+            if(out != null)
+                this.out.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
         try {
-            this.soc.close();
+            if(soc != null)
+                this.soc.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public synchronized void reconnect(){
+        try {
+            close();
+            Thread.sleep(1000);
+            init();
+        }catch(Exception ex){
+
         }
     }
 }

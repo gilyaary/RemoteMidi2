@@ -92,6 +92,16 @@ public class LgSequencerManager {
         return null;
     }
 
+    public void notifyTrackInputsOutputs(){
+        for (Integer trackInfoId : sequencerContext.trackInfoMap.keySet()){
+            TrackInfo trackInfo = sequencerContext.trackInfoMap.get(trackInfoId);
+            String trackName = trackInfo.getName();
+            //TODO:for now set default inputs. Later we MAY allow setting these in the TrackInfo
+            //TODO: Also we may be stopped and still accept input events from MIDI controllers and send them to a track
+            //The event should then be sent to all outputs associated with this track
+        }
+    }
+
     /*
     TODO: We need to find a way to save this info in the midi file. As all tracks have information that is not part of the default implementation of javax.midi.Track
     For now just setting default names etc.
@@ -101,6 +111,7 @@ public class LgSequencerManager {
         this.sequencer.setSequence(this.sequencerContext.sequence);
         sequencerContext.trackInfoMap.clear();
         sequencerContext.trackInfoIdGen.set(1);
+        //set tracks,
         for (Track track : this.sequencerContext.sequence.getTracks()){
             Integer trackInfoId = sequencerContext.trackInfoIdGen.getAndIncrement();
             TrackInfo trackInfo = new TrackInfo(trackInfoId, track);

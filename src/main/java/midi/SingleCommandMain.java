@@ -16,15 +16,18 @@ public class SingleCommandMain {
 
         int channel = 0;
 
-        for(int sound=0; sound<127; sound++) {
-            ShortMessage pcMessage = new ShortMessage(ShortMessage.PROGRAM_CHANGE, channel, sound, 0);
-            tx.sendMidiMessage(pcMessage, "2#A.2");
-            msg = new ShortMessage(ShortMessage.NOTE_ON, 60, 127);
-            tx.sendMidiMessage(msg, "2#A.2");
-            Thread.sleep(1000);
-            msg = new ShortMessage(ShortMessage.NOTE_OFF, 60, 127);
-            tx.sendMidiMessage(msg, "2#A.2");
-        }
+//        for(int sound=0; sound<127; sound++) {
+//            ShortMessage pcMessage = new ShortMessage(ShortMessage.PROGRAM_CHANGE, channel, sound, 0);
+//            tx.sendMidiMessage(pcMessage, "2#A.2");
+//            msg = new ShortMessage(ShortMessage.NOTE_ON, 60, 127);
+//            tx.sendMidiMessage(msg, "2#A.2");
+//            Thread.sleep(1000);
+//            msg = new ShortMessage(ShortMessage.NOTE_OFF, 60, 127);
+//            tx.sendMidiMessage(msg, "2#A.2");
+//        }
+
+        //Create Virtual ALSA Input Port, Index 1, Name: VIRTUAL_IN_PORT_1
+        tx.sendCommand("3#I.A.V.3.VIRTUAL_IN_PORT_3.@");
 
         tx.close();
     }

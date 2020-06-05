@@ -91,9 +91,6 @@ public class SequencerController {
     public TrackInfo deleteTrack(@RequestParam Integer trackInfoId) {
         return sequencerManager.deleteTrack(trackInfoId);
     }
-
-
-
 }
 
 //TODO:
