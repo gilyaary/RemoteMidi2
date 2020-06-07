@@ -75,6 +75,7 @@ public class LgSequencerManager {
             sequencerContext.trackInfoMap.put(trackInfoId, trackInfo);
             return trackInfo;
         }
+        notifyTrackInputsOutputs();
         return null;
     }
 
@@ -89,16 +90,21 @@ public class LgSequencerManager {
                 return trackInfo;
             }
         }
+        notifyTrackInputsOutputs();
         return null;
     }
 
+    //TODO: This may be a listener for track config changes event. For now it is just a simple call
     public void notifyTrackInputsOutputs(){
         for (Integer trackInfoId : sequencerContext.trackInfoMap.keySet()){
             TrackInfo trackInfo = sequencerContext.trackInfoMap.get(trackInfoId);
-            String trackName = trackInfo.getName();
             //TODO:for now set default inputs. Later we MAY allow setting these in the TrackInfo
             //TODO: Also we may be stopped and still accept input events from MIDI controllers and send them to a track
             //The event should then be sent to all outputs associated with this track
+            Integer trackId = trackInfo.getId();
+            String trackName = trackInfo.getName();
+            String command = String.format("3#I.A.V.%s.VIRTUAL_IN_PORT_%s.", trackId, trackName);
+            this.localHostRtMidiServerConnection.sendCommand(command);
         }
     }
 
@@ -121,6 +127,7 @@ public class LgSequencerManager {
             trackInfo.getOutputPorts().add(new MidiPortInfo(MidiPortInfo.PortType.OUTPUT, 1, "DefaultOutputPort"));
             sequencerContext.trackInfoMap.put(trackInfoId, trackInfo);
         }
+        notifyTrackInputsOutputs();
     }
 
 

@@ -47,7 +47,7 @@ public class LgSequencer implements Sequencer {
     @PreDestroy
     public void cleanup(){
         this.close();
-        this.midiConnection.close();
+        this.midiConnection.destroy();
     }
 
 

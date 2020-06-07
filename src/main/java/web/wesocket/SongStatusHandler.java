@@ -27,6 +27,7 @@ public class SongStatusHandler implements WebSocketHandler{
                     Thread.sleep(100);
                 }
             }catch(Exception e){
+                session.close();
                 e.printStackTrace();
             }
         }

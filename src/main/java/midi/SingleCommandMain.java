@@ -27,8 +27,8 @@ public class SingleCommandMain {
 //        }
 
         //Create Virtual ALSA Input Port, Index 1, Name: VIRTUAL_IN_PORT_1
-        tx.sendCommand("3#I.A.V.3.VIRTUAL_IN_PORT_3.@");
+        tx.sendCommand("3#I.A.V.2.VIRTUAL_IN_PORT_2.@");
 
-        tx.close();
+        tx.destroy();
     }
 }
