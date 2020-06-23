@@ -236,7 +236,7 @@ public class LgSequencer implements Sequencer {
 
     @Override
     public long getTickPosition() {
-        return 0;
+        return sequencerRunnable.getiPlayTimeInTicks();
     }
 
     @Override

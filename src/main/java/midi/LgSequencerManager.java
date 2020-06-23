@@ -9,6 +9,14 @@ import javax.annotation.PostConstruct;
 import javax.sound.midi.*;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /*
 Since Sequence is a concrete class there is some issue with extending it.
@@ -108,17 +116,45 @@ public class LgSequencerManager {
         }
     }
 
+    public Set<String> getMidiFiles(){
+        Set<String> filePaths = Collections.EMPTY_SET;
+        try {
+            filePaths = listFilesUsingFileWalk("/home/gil/Music", 5);
+        }catch(IOException iox){
+
+        }
+        return filePaths;
+    }
+
+    public Set<String> listFilesUsingFileWalk(String dir, int depth) throws IOException {
+        try (Stream<Path> stream = Files.walk(Paths.get(dir), depth)) {
+            return stream
+                    .filter(file -> !Files.isDirectory(file))
+                    .filter(file -> file.endsWith(".mid") || file.endsWith(".midi"))
+                    .map(Path::getFileName)
+                    .map(Path::toString)
+                    .collect(Collectors.toSet());
+        }
+    }
+
     /*
     TODO: We need to find a way to save this info in the midi file. As all tracks have information that is not part of the default implementation of javax.midi.Track
     For now just setting default names etc.
      */
     public void loadSequenceFromFileSystem(String midi_file) throws InvalidMidiDataException, IOException {
-        sequencerContext.sequence = MidiSystem.getSequence(new File(midi_file));
+
+        //sequencerContext.sequence = MidiSystem.getSequence(new File(midi_file));
+        sequencerContext.sequence = new Sequence(0, 32);
+        sequencerContext.sequence.createTrack();
+
+
         this.sequencer.setSequence(this.sequencerContext.sequence);
         sequencerContext.trackInfoMap.clear();
         sequencerContext.trackInfoIdGen.set(1);
         //set tracks,
-        for (Track track : this.sequencerContext.sequence.getTracks()){
+        Track[] tracks = this.sequencerContext.sequence.getTracks();
+        for (int i=0; i<tracks.length; i++) {
+            Track track = tracks[i];
             Integer trackInfoId = sequencerContext.trackInfoIdGen.getAndIncrement();
             TrackInfo trackInfo = new TrackInfo(trackInfoId, track);
             //set a default name

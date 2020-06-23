@@ -16,6 +16,12 @@ public class SequencerRunnable implements Runnable{
     private Synthesizer synth;
 
     SequencerContext sequencerContext;
+    private long iPlayTimeInTicks;
+
+    public long getiPlayTimeInTicks(){
+        return iPlayTimeInTicks;
+    }
+
 
 
     enum MODE {PLAYBACK, RECORD}
@@ -122,7 +128,8 @@ public class SequencerRunnable implements Runnable{
             double ticksPerSecond = beatsPerSecond * resolution; //resolution is how many ticks we have in a single beat
             double singleTickTime = 1.00 / ticksPerSecond;
             double playTimeInTicks = (songPositionMs/1000.00) / singleTickTime;
-            long iPlayTimeInTicks = Math.round(playTimeInTicks);
+
+            this.iPlayTimeInTicks = Math.round(playTimeInTicks);
 
 
             //System.out.printf("Time(ticks): %s%n", iPlayTimeInTicks);

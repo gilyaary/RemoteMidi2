@@ -12,9 +12,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class SequencerContext {
-    Map<Integer, RtMidiTransmitter> transmitterMap = new HashMap<>();
-    Map<Integer, LgSequencerMidiEventReceiver> receiverMap = new HashMap<>();
-    Sequence sequence;
-    Map<Integer, TrackInfo> trackInfoMap = new HashMap<>();
-    AtomicInteger trackInfoIdGen = new AtomicInteger(1);
+    public Map<Integer, RtMidiTransmitter> transmitterMap = new HashMap<>();
+    public Map<Integer, LgSequencerMidiEventReceiver> receiverMap = new HashMap<>();
+    public Sequence sequence;
+    public Map<Integer, TrackInfo> trackInfoMap = new HashMap<>();
+    public AtomicInteger trackInfoIdGen = new AtomicInteger(1);
 }

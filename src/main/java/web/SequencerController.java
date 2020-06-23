@@ -13,6 +13,7 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Sequence;
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
 @RestController
 public class SequencerController {
@@ -90,6 +91,13 @@ public class SequencerController {
     @RequestMapping(value = "/sequencer/track", method = RequestMethod.DELETE)
     public TrackInfo deleteTrack(@RequestParam Integer trackInfoId) {
         return sequencerManager.deleteTrack(trackInfoId);
+    }
+
+    //we want to be able to play MIDI files from different sources
+    @GetMapping("/sequencer/files")
+    @RequestMapping(value = "/sequencer/files", method = RequestMethod.GET)
+    public Set<String> getMidiFiles() {
+        return sequencerManager.getMidiFiles();
     }
 }
 

@@ -1,16 +1,26 @@
 package tcp.client;
 
+import midi.LgSequencer;
+import midi.SequencerContext;
+import midi.TrackInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.sound.midi.MidiEvent;
 import javax.sound.midi.MidiMessage;
+import javax.sound.midi.ShortMessage;
 import java.io.*;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 @Component
 public class RtMidiConnection {
+
+    @Autowired
+    LgSequencer sequencer;
 
     private Socket soc;
     private InputStream in;
@@ -20,6 +30,10 @@ public class RtMidiConnection {
     ArrayBlockingQueue<String> midiEventsInputQueue = new ArrayBlockingQueue<>(100);
     InputRunnable inputRunnable = new InputRunnable();
     Thread t = new Thread(inputRunnable);
+
+    @Autowired
+    SequencerContext sequencerContext;
+
 
     public void init(){
         t.start();
@@ -85,6 +99,9 @@ public class RtMidiConnection {
         public void run() {
             while (!stopped) {
                 try {
+                    if(soc == null || soc.isClosed()){
+                        reconnect();
+                    }
                     //System.out.println(cmdString);
                     BufferedReader br = new BufferedReader(reader);
                     StringBuffer lines = new StringBuffer();
@@ -103,16 +120,32 @@ public class RtMidiConnection {
 
                                 //2#VIRTUAL_IN_PORT_Track 1.144.63.127.
                                 int i1 = responseLines.indexOf("#");
-                                int i2 = responseLines.indexOf(" ");
+                                int i2 = responseLines.indexOf(".");
                                 System.out.println("Midi In Event: " + responseLines);
+                                responseLines = responseLines.trim();
                                 if(i1 >= 0 && i2 >= 0){
-                                    String trackName = responseLines.substring(i1+1, i2);
-                                    String midiCommandString = responseLines.substring(i2+1);
-                                    String[] midiCommandSegments = midiCommandString.split("\\.");
+                                    final String trackName = responseLines.substring(i1+1, i2);
+                                    final String midiCommandString = responseLines.substring(i2+1);
+                                    final String[] midiCommandSegments = midiCommandString.split("\\.");
                                     System.out.println("Track Name: " + trackName);
                                     System.out.println("Midi Command Segments: " + Arrays.toString(midiCommandSegments));
-                                    //TODO: find the
-                                    
+                                    //TODO: find the track
+                                    Map<Integer, TrackInfo> trackInfoMap = sequencerContext.trackInfoMap;
+                                    for(Integer trackId : trackInfoMap.keySet()){
+                                        final TrackInfo trackInfo = trackInfoMap.get(trackId);
+                                        final String currentTrackName = trackInfo.getName();
+                                        if(trackName.indexOf(currentTrackName) != -1){
+                                            int [] values = new int[midiCommandSegments.length];
+                                            for(int i=0; i<midiCommandSegments.length;i++){
+                                                values[i] = Integer.parseInt(midiCommandSegments[i]);
+                                            }
+                                            MidiMessage midiMessage = new ShortMessage(values[0],values[1],values[2]);
+                                            MidiEvent event = new MidiEvent(midiMessage, sequencer.getTickPosition());
+                                            trackInfo.getTrack().add(event);
+                                            //TODO: the sent event may be either realtime or at a certain time index. We should know which case it is.
+                                            //for real time the player must be in play mode
+                                        }
+                                    }
                                 }
                                 //midiEventsInputQueue.add(responseLines);
 
@@ -129,11 +162,15 @@ public class RtMidiConnection {
                                 lines.append(response);
                                 lines.append("\n");
                             }
+                            else{
+                                closeConnection();
+                                break;
+                            }
                         }
                     }
 
                 } catch (Exception ex) {
-                    System.out.println("Exiting read loop");
+                    //System.out.println("Exiting read loop");
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
@@ -179,11 +216,13 @@ public class RtMidiConnection {
                     out.flush();
                 }
                 else{
-                    reconnect();
+                    //reconnect();
+                    closeConnection();
                 }
                 System.out.println(cmdString);
             } catch (Exception e) {
-                reconnect();
+                //reconnect();
+                closeConnection();
             }
         }
     }
