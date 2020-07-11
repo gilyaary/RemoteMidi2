@@ -1,0 +1,44 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>jQuery UI Button - Default functionality</title>
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <link rel="stylesheet" href="/resources/demos/style.css">    
+        <link rel="stylesheet" href="css/slider_css.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    
+        <script src="scripts/canvas_control.js"></script>
+    </head>
+    
+    <style>
+        div{
+            padding: 10 10 10 10;
+        }
+        canvas{
+            border:1px solid #000000;
+        }
+    </style>
+    
+    <div id="canvas_control_app">
+        <div>{{message}}</div>
+        <div>
+            Bars To Display: <input v-model="barsToDisplay"/>
+        </div>
+        <div>
+            Start Bar: <input v-model="startBar"/>
+        </div>
+        <div>
+            Ticks Per Bar: <input v-model="ticksPerBar"/>
+        </div>
+        <div>
+            <button v-on:click="displayTracks">Display Tracks</button>
+        </div>
+        <div>
+            <canvas id="canvas1" width="750" height="250"></canvas>
+        </div>
+    </div>
+</html>
