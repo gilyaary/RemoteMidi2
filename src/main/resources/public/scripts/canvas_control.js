@@ -239,3 +239,11 @@ $( function() {
     }
 
 } );
+
+
+/*
+        TODO:
+        Add the notes display.
+        Add refresh logic to move a position marker over the canvas. We may be able to overlay with another div absolute position (z-index)
+        Once position marker gets to the end repaint with the new starting bar
+*/
