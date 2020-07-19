@@ -41,6 +41,15 @@ public class SequencerController {
         SequenceInfo seqInfo = new SequenceInfo(sequence);
         return seqInfo;
     }
+    @GetMapping("/sequencer/sequenceInfo")
+    @RequestMapping(value = "/sequencer/sequenceInfo", method = RequestMethod.GET)
+    public SequenceInfo getSequenceInfo() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
+        Sequence sequence = sequencerManager.getLoadedSequence();
+
+
+        SequenceInfo seqInfo = new SequenceInfo(sequence);
+        return seqInfo;
+    }
 
     @PutMapping("/sequencer/play")
     @RequestMapping(value = "/sequencer/play", method = RequestMethod.PUT)

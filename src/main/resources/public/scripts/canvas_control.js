@@ -1,4 +1,54 @@
 $( function() {
+    
+    Vue.component('track_display', {
+        props: ['track', 'start', 'bars', 'ticks'],
+        //<div>Event Count: {{track.eventCount}}</div>
+        template: `
+            <canvas width="1200" height="200"></canvas>
+        `,
+        methods: {
+            displayTrack: function(el,parent){
+                /*
+                //we expose properties for all these so no need to access parent - Independence.
+                var ticksPerBar = parent.ticksPerBar;
+                var barsToDisplay = parent.barsToDisplay;
+                var startBar = parent.startBar;
+                */
+                displayTrackOnCanvas(el, this.bars, this.start, this.ticks);
+                //now we need to display events
+            }
+        },
+        updated: function(){
+            //this.$el.style.background = 'red';
+            this.displayTrack(this.$el, this.$parent);
+        },
+        mounted: function(){
+            //this.$el.style.background = 'green';
+            this.displayTrack(this.$el, this.$parent);
+        },
+        //if any watched property is modified we can take action. We can repaint or we can modify a computed property
+        watch: {
+            track: function(val){
+                //displayTrackOnCanvas(this.$el, barsToDisplay, startBar, ticksPerBar);
+            },
+            start: function(val){
+                //displayTrackOnCanvas(this.$el, barsToDisplay, startBar, ticksPerBar);
+            },
+            bars: function(val){
+                displayTrackOnCanvas(this.$el, this.bars, this.start, this.ticks);
+            },
+            ticks: function(val){
+                //displayTrackOnCanvas(this.$el, barsToDisplay, startBar, ticksPerBar);
+            },
+        },
+
+//        data: function(){
+//            var eventCount = this.$props.track.eventCount;
+//            var events = this.$props.track.events;
+//
+//        },
+    })
+
     var canvas_control_app = new Vue({
           el: '#canvas_control_app',
           data: {
@@ -7,8 +57,16 @@ $( function() {
               barsToDisplay: 4,
               startBar: 1,
               ticksPerBar: 32,
+              fileInfo: {
+                name: 'GIL',
+                files: [],
+                selectedFile: '',
+                loadedSequence: null,
+              },
+
           },
           methods: {
+              /*
               displayTracks: function(){
                     var canvas1 = document.getElementById("canvas1");
                     var canvas2 = document.getElementById("canvas2");
@@ -18,7 +76,42 @@ $( function() {
                     displayLegend(canvas1, this.barsToDisplay, this.startBar, this.ticksPerBar);
                     displayTrackOnCanvas(canvas2, this.barsToDisplay, this.startBar, this.ticksPerBar);                
               },
-          }
+              */
+              getSequenceInfo: function(){
+                    //we need to call this otherwise Vue just updates the tracks that changed their properties
+                    //Vue.set(this.fileInfo, 'loadedSequence', {});
+                    //this.loadedSequence = {};
+
+                    //TODO: this should also be converted into a component
+                    var instance = this;
+                    var url = "http://localhost:8080/sequencer/sequenceInfo";
+                    $.ajax({
+                        url: url,
+                        type: 'GET',
+                        data: "",
+                        success: function(responseData) {
+                            //alert(responseData);
+                            Vue.set(instance.fileInfo, 'loadedSequence', responseData);
+                            //instance.fileInfo.loadedSequence.trackInfo[0].events[0].message.data.message
+
+                        }
+                    });
+
+                },
+          },
+          components: ['track_display'],
+          updated: function(){
+              var canvas1 = document.getElementById("canvas1");
+              if(canvas1){
+                  displayLegend(canvas1, this.barsToDisplay, this.startBar, this.ticksPerBar);
+              }
+          },
+          mounted: function(){
+              var canvas1 = document.getElementById("canvas1");
+              if(canvas1){
+                  displayLegend(canvas1, this.barsToDisplay, this.startBar, this.ticksPerBar);
+              }
+          },
     });
 
     class Line {

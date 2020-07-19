@@ -26,19 +26,43 @@
     <div id="canvas_control_app">
         <div>{{message}}</div>
         <div>
-            Bars To Display: <input v-model="barsToDisplay"/>
+            Bars To Display: <input v-model.number="barsToDisplay" type="number" />
         </div>
         <div>
-            Start Bar: <input v-model="startBar"/>
+            Start Bar: <input v-model.number="startBar" type="number" />
         </div>
         <div>
-            Ticks Per Bar: <input v-model="ticksPerBar"/>
+            Ticks Per Bar: <input v-model.number="ticksPerBar" type="number" />
         </div>
         <div>
-            <button v-on:click="displayTracks">Display Tracks</button>
+            <button v-on:click="getSequenceInfo">Display Sequence</button>
         </div>
-        <canvas id="canvas1" width="750" height="30"></canvas><br>
-        <canvas id="canvas2" width="750" height="250"></canvas>
-        
+        <br><br>
+        <div v-if="fileInfo && fileInfo.loadedSequence">
+            <div>
+                Ticks: {{fileInfo.loadedSequence.tickLength}}
+            </div>
+            <div>
+                Ticks[0]: {{fileInfo.loadedSequence.tickLength}}
+            </div>
+            <div>
+                Time: {{fileInfo.loadedSequence.microsecondLength}}
+            </div>
+            <div>
+                Tracks: {{fileInfo.loadedSequence.trackCount}}
+            </div>
+            <canvas id="canvas1" width="1200" height="30"></canvas><br>
+            <!-- fileInfo.loadedSequence.trackInfo[0].events[0].message -->
+            <!--
+            <span>Event Count: {{ti.eventCount}}</span>
+            <span>Ticks: {{ti.ticks}}</span>
+            -->
+            <!-- div v-for="ev in ti.events">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>{{ev}}</span>
+            </div -->
+            <track_display v-for="ti in fileInfo.loadedSequence.trackInfo" :track="ti" :start="startBar" :bars="barsToDisplay" :ticks="ticksPerBar"/>
+        </div>
+        <br><br>
     </div>
+
 </html>

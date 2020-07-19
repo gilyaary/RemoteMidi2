@@ -177,6 +177,10 @@ public class LgSequencerManager {
         return sequencerContext.sequence;
     }
 
+    public Sequence getLoadedSequence() throws InvalidMidiDataException, IOException {
+        return this.sequencerContext.sequence;
+    }
+
 
     public void setTempoInBPM(int i) {
         this.sequencer.setTempoInBPM(i);
