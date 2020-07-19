@@ -143,9 +143,9 @@ public class LgSequencerManager {
      */
     public void loadSequenceFromFileSystem(String midi_file) throws InvalidMidiDataException, IOException {
 
-        //sequencerContext.sequence = MidiSystem.getSequence(new File(midi_file));
-        sequencerContext.sequence = new Sequence(0, 32);
-        sequencerContext.sequence.createTrack();
+        sequencerContext.sequence = MidiSystem.getSequence(new File(midi_file));
+        //sequencerContext.sequence = new Sequence(0, 32);
+        //sequencerContext.sequence.createTrack();
 
 
         this.sequencer.setSequence(this.sequencerContext.sequence);
