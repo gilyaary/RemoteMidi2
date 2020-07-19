@@ -16,38 +16,33 @@
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="scripts/player_control.js"></script>
-
 </head>
 <body>
+<div class="widget">
+    <h1>Score Control Buttons</h1>
+    <button id="ff">FF</button>
+    <button id="rew">REW</button>
+    <button id="start">|<</button>
+    <button id="end">>|</button>
+</div>
+</br></br></br>
 
-<div id="file_app">
-    <div class="widget">
-        <h1>Score Control Buttons</h1>
-        <button v-on:click="showFiles">Show Files</button>
-    </div>
-    </br></br></br>
-
-    <p>Files:</p>
+<div id="track_control_app">
     <div>
-        <div v-for="file in fileInfo.files" :class="{ selectedItem: isSelected(file) }" @click="selectFile(file)" @dblClick="openFile(file)">
-            {{file}}
-        </div>
-    </div>
-    <br><br>
-    <div v-if="fileInfo && fileInfo.loadedSequence">
-        <div>
-            Ticks: {{fileInfo.loadedSequence.tickLength}}
-        </div>
-        <div>
-            Time: {{fileInfo.loadedSequence.microsecondLength}}
-        </div>
-        <div>
-            Tracks: {{fileInfo.loadedSequence.trackCount}}
-        </div>
+        <p>Score:</p>
+        {{score.trackName}}
     </div>
 </div>
 
 
 <br><br>
+<div>
+    <a href="tracks.html">Tracks</a>
+</div>
+<br><br>
+<div>
+    <a href="score.html">Score</a>
+</div>
+
 </body>
 </html>

@@ -87,4 +87,52 @@
             }
         }
 
+
+        //Additional VUE controls
+        var file_app = new Vue({
+              el: '#file_app',
+              data: {
+                  fileInfo:{
+                        name: 'GIL',
+                        files: [],
+                        selectedFile: '',
+                        loadedSequence: null,
+                  },
+              },
+              methods: {
+                  showFiles: function(){
+                        this.fileNames = [];
+                        var instance = this;
+                        $.get( "/sequencer/files", function( responseData ) {
+                            Vue.set(instance.fileInfo, 'name', 'Joe');
+                            Vue.set(instance.fileInfo, 'files', responseData);
+                        });
+                  },
+                  isSelected: function(fileName){
+                        return this.fileInfo.selectedFile === fileName;
+                        //return true;
+                  },
+                  selectFile: function(fileName){
+                        this.fileInfo.selectedFile = fileName;
+                  },
+                  openFile: function(fileName){
+                        var instance = this;
+                        var url = "/sequencer/load/" + encodeURI(fileName);
+                        $.ajax({
+                            url: url,
+                            type: 'PUT',
+                            data: "",
+                            success: function(responseData) {
+                                //alert(responseData);
+                                Vue.set(instance.fileInfo, 'loadedSequence', responseData);
+                            }
+                        });
+
+
+                  },
+              }
+        });
+
+
+
   } );

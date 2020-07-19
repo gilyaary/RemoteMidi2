@@ -130,22 +130,32 @@ public class LgSequencerManager {
         try (Stream<Path> stream = Files.walk(Paths.get(dir), depth)) {
             return stream
                     .filter(file -> !Files.isDirectory(file))
-                    .filter(file -> file.endsWith(".mid") || file.endsWith(".midi"))
+                    .filter(file -> file.getFileName().toString().endsWith(".mid") || file.getFileName().toString().endsWith(".midi"))
                     .map(Path::getFileName)
                     .map(Path::toString)
                     .collect(Collectors.toSet());
         }
     }
-
+/*
+    public Set<File> listFilesPropsUsingFileWalk(String dir, int depth) throws IOException {
+        try (Stream<Path> stream = Files.walk(Paths.get(dir), depth)) {
+            return stream
+                    .filter(file -> !Files.isDirectory(file))
+                    .filter(file -> file.getFileName().toString().endsWith(".mid") || file.getFileName().toString().endsWith(".midi"))
+                    .map(Path::toFile)
+                    .collect(Collectors.toSet());
+        }
+    }
+*/
     /*
     TODO: We need to find a way to save this info in the midi file. As all tracks have information that is not part of the default implementation of javax.midi.Track
     For now just setting default names etc.
      */
-    public void loadSequenceFromFileSystem(String midi_file) throws InvalidMidiDataException, IOException {
+    public Sequence loadSequenceFromFileSystem(String midi_file) throws InvalidMidiDataException, IOException {
 
         sequencerContext.sequence = MidiSystem.getSequence(new File(midi_file));
         //sequencerContext.sequence = new Sequence(0, 32);
-        //sequencerContext.sequence.createTrack();
+        sequencerContext.sequence.createTrack();
 
 
         this.sequencer.setSequence(this.sequencerContext.sequence);
@@ -164,6 +174,7 @@ public class LgSequencerManager {
             sequencerContext.trackInfoMap.put(trackInfoId, trackInfo);
         }
         notifyTrackInputsOutputs();
+        return sequencerContext.sequence;
     }
 
 

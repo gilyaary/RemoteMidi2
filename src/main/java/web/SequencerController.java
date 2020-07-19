@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import tcp.client.RtMidiConnection;
 
-import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.MidiUnavailableException;
-import javax.sound.midi.Sequence;
+import javax.sound.midi.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
@@ -36,11 +33,20 @@ public class SequencerController {
         return response;
     }
 
+    @PutMapping("/sequencer/load/{file}")
+    @RequestMapping(value = "/sequencer/load/{file}", method = RequestMethod.PUT)
+    public SequenceInfo load(@PathVariable(name="file") String file) throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
+        String midi_file = "/home/gil/Music/" + file;
+        Sequence sequence = sequencerManager.loadSequenceFromFileSystem(midi_file);
+        SequenceInfo seqInfo = new SequenceInfo(sequence);
+        return seqInfo;
+    }
+
     @PutMapping("/sequencer/play")
     @RequestMapping(value = "/sequencer/play", method = RequestMethod.PUT)
     public String play() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
-        String midi_file = "/home/gil/Music/gil_music.mid";
-        sequencerManager.loadSequenceFromFileSystem(midi_file);
+        //String midi_file = "/home/gil/Music/gil_music.mid";
+        //sequencerManager.loadSequenceFromFileSystem(midi_file);
         sequencerManager.setTempoInBPM(160);
         sequencerManager.setMicrosecondPosition(0);
         sequencerManager.start();
