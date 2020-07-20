@@ -14,7 +14,7 @@ $( function() {
                 var barsToDisplay = parent.barsToDisplay;
                 var startBar = parent.startBar;
                 */
-                displayTrackOnCanvas(el, this.bars, this.start, this.ticks);
+                displayTrackOnCanvas(el, this.track, this.bars, this.start, this.ticks);
                 //now we need to display events
             }
         },
@@ -29,16 +29,16 @@ $( function() {
         //if any watched property is modified we can take action. We can repaint or we can modify a computed property
         watch: {
             track: function(val){
-                //displayTrackOnCanvas(this.$el, barsToDisplay, startBar, ticksPerBar);
+                displayTrackOnCanvas(this.$el, this.track, this.bars, this.start, this.ticks);
             },
             start: function(val){
-                //displayTrackOnCanvas(this.$el, barsToDisplay, startBar, ticksPerBar);
+                displayTrackOnCanvas(this.$el, this.track, this.bars, this.start, this.ticks);
             },
             bars: function(val){
-                displayTrackOnCanvas(this.$el, this.bars, this.start, this.ticks);
+                displayTrackOnCanvas(this.$el, this.track, this.bars, this.start, this.ticks);
             },
             ticks: function(val){
-                //displayTrackOnCanvas(this.$el, barsToDisplay, startBar, ticksPerBar);
+                displayTrackOnCanvas(this.$el, this.track, this.bars, this.start, this.ticks);
             },
         },
 
@@ -54,9 +54,9 @@ $( function() {
           data: {
               song_position: 0,
               message: "Tracks Notes",
-              barsToDisplay: 4,
+              barsToDisplay: 8,
               startBar: 1,
-              ticksPerBar: 32,
+              ticksPerBar: 256,
               fileInfo: {
                 name: 'GIL',
                 files: [],
@@ -187,13 +187,18 @@ $( function() {
     }
 
 
-    function displayTrackOnCanvas(canvas, barsToDisplay, startBar, ticksPerBar){
-        var markers = getMarkers(barsToDisplay, startBar, ticksPerBar);//based on 100 * 100 scale
+    function displayTrackOnCanvas(canvas, track, barsToDisplay, startBar, ticksPerBar){
+        var markers = getBars(barsToDisplay, startBar, ticksPerBar);//based on 100 * 100 scale
         var ticks = getTicks(barsToDisplay, startBar, ticksPerBar);//based on 100 * 100 scale
         markers = markers.concat(ticks);
         var beats = getBeats(barsToDisplay, startBar, 4);//based on 100 * 100 scale
         markers = markers.concat(beats);
-
+        try{
+            var midiMessages = getMidiMessages(track, barsToDisplay, startBar, ticksPerBar);
+            markers = markers.concat(midiMessages);
+        }catch(ex){
+            //alert(ex);
+        }
         var width = canvas.width;
         var height = canvas.height;
         var scaledMarkers = scale(markers, width, height);
@@ -214,7 +219,7 @@ $( function() {
         return markers;
     }
 
-    function getMarkers(barsToDisplay, startBar, ticksPerBar){
+    function getBars(barsToDisplay, startBar, ticksPerBar){
         var markers = [];
         var barWidth = 100 / barsToDisplay;
         for(var i=0; i<barsToDisplay; i++){
@@ -225,7 +230,7 @@ $( function() {
             markers[i] = new Line(x1,x2,y1,y2);
             markers[i].color = 'FFDDFF';
             markers[i].type = 'line';
-            markers[i].lineWidth = 0.5;
+            markers[i].lineWidth = 0.1;
         }
         return markers;
     }
@@ -250,6 +255,108 @@ $( function() {
         }
         return markers;
     }
+
+    function getMidiMessages(track, barsToDisplay, startBar, ticksPerBar){
+        var trackEvents = track.events;
+        var markers = [];
+        var tickCount = barsToDisplay*ticksPerBar;
+        var tickWidth = 100 / tickCount;
+
+        var startTick = (startBar-1) * ticksPerBar;
+        var endTick = (startBar+barsToDisplay-1) * ticksPerBar;
+
+        processNoteEvents(trackEvents);
+
+        for( var i=0; i<trackEvents.length; i++){
+            var ev = trackEvents[i];
+            var eventTick = ev.tick;
+            var message = ev.message;
+            var cmd = message.command;
+            var data1 = message.data1;
+            var data2 = message.data2;
+
+            var channel = cmd & 15; //and xxxx cccc with 0000 1111 to get the channel's 4 digits
+            var command = cmd >> 4; //get the command 4 digits by shifting 4 places to the right: xxxxcccc >> 4 = 0000xxxx (all the c's are truncated)
+            var pitch = data1; //0-127
+            var velocity = data2; //0-127
+
+            if(eventTick >= startTick && eventTick <= endTick){
+                //todo: if this is a note start event then we must also look for the note end event later in the events array
+                //alternatively we can process the array and create another array of Note events
+                //we do it once when the new sequence is loaded (when "display sequence" button clicked and ajax returns)
+                //then we look which event {startTick, endTick} are in range
+                var x1 = tickWidth * (eventTick - startTick) + 0.1;
+                var x2 = x1 + tickWidth + 0.1;
+
+
+                //note off (1000 CCCC)
+                var startPitch = 50;
+                var endPitch = 100;
+                var pitchesToShow = endPitch - startPitch;
+
+                if(command == 8 || (velocity === 0)){
+                    var y1 = 100 - ((pitch-startPitch)/pitchesToShow * 100);
+                    var y2 = y1;
+                    var marker = new Line(x1,x2,y1,y2);
+                    marker.color = 'green';
+                    marker.type = 'line';
+                    marker.x1 = x1;
+                    marker.x2 = x2;
+                    marker.y1 = y1;
+                    marker.y2 = y2;
+                    marker.lineWidth = 0.3;
+                    markers.push(marker);
+                }
+                else if(command == 9 && ev.endEvent){
+                    var x2 = tickWidth * (ev.endEvent.tick - startTick) + 0.1;
+                    var y1 = 100 - ((pitch-startPitch)/pitchesToShow * 100);
+                    var y2 = y1;
+                    var marker = new Line(x1,x2,y1,y2);
+                    marker.color = 'red';
+                    marker.type = 'line';
+                    marker.x1 = x1;
+                    marker.x2 = x2;
+                    marker.y1 = y1;
+                    marker.y2 = y2;
+                    marker.lineWidth = 0.3;
+                    markers.push(marker);
+                }
+            }
+        }
+         return markers;
+    }
+
+    //couple start note events with end note events
+    function processNoteEvents(trackEvents){
+        var startedNotesByPitch = [];
+        for( var i=0; i<trackEvents.length; i++){
+            var ev = trackEvents[i];
+            var eventTick = ev.tick;
+            var message = ev.message;
+            var cmd = message.command;
+            var data1 = message.data1;
+            var data2 = message.data2;
+
+            var channel = cmd & 15; //and xxxx cccc with 0000 1111 to get the channel's 4 digits
+            var command = cmd >> 4; //get the command 4 digits by shifting 4 places to the right: xxxxcccc >> 4 = 0000xxxx (all the c's are truncated)
+            var pitch = data1; //0-127
+            var velocity = data2; //0-127
+            //note off (1000 CCCC)
+            if(command == 8 || (velocity === 0)){
+                if( startedNotesByPitch[pitch] ){
+                    //associate the start event with end event and end event with start event
+                    startedNotesByPitch[pitch].endEvent = ev;
+                    ev.startEvent = startedNotesByPitch[pitch];
+                    startedNotesByPitch[pitch] = null;
+                }
+            }
+            //note on
+            else if(command == 9){
+                startedNotesByPitch[pitch] = ev;
+            }
+        }
+    }
+
     function getBeats(barsToDisplay, startBar, beatsPerBar){
         var markers = [];
         var tickCount = barsToDisplay*beatsPerBar;
