@@ -38,7 +38,7 @@
             <!-- div v-for="ev in ti.events">
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>{{ev}}</span>
             </div -->
-            <track-display v-bind:key="ti" v-for="ti in fileInfo.loadedSequence.trackInfo" :track="ti" :start="startBar" :bars="barsToDisplay" :ticks="ticksPerBar"/>
+            <track-display v-bind:key="ti.ticks" v-for="ti in fileInfo.loadedSequence.trackInfo" :track="ti" :start="startBar" :bars="barsToDisplay" :ticks="ticksPerBar"/>
         </div>
         <br><br>
     </div>
@@ -55,21 +55,54 @@
 <script>
   
   import TrackDisplay from './TrackDisplay.vue'
+  import Home from './Home.vue'
+  import Vue from 'vue'
+  import axios from 'axios'
+
+  import * as canvasDisplayFunctions from '../canvas_display.js' 
 
   export default {
     data: () => {
         return {
             fileInfo: {
                 loadedSequence: {
-                    trackInfo: {
                     
-                    }
                 }
             },
             barsToDisplay: 2,
             startBar:1,
-            ticksPerBar: 32
+            ticksPerBar: 32,
+            message: 'Tracks.vue',
         };
+    },
+    methods: {
+        getSequenceInfo: function(){
+            //we need to call this otherwise Vue just updates the tracks that changed their properties
+            //Vue.set(this.fileInfo, 'loadedSequence', {});
+            //this.loadedSequence = {};
+
+            //TODO: this should also be converted into a component
+            var instance = this;
+            var url = "http://localhost:8080/sequencer/sequenceInfo";
+            axios.get(url).then ((responseData) => {
+                //Vue.set(instance.fileInfo, 'loadedSequence', responseData.data);
+                this.fileInfo.loadedSequence = responseData.data;
+            });
+        },
+    },
+    components: {
+        TrackDisplay
+    },
+    updated: function(){
+        console.log('updated');
+        var canvas = document.getElementById('canvas1');
+        canvasDisplayFunctions.displayLegend(canvas, this.barsToDisplay, this.startBar, this.ticksPerBar);
+    },
+    mounted: function(){
+        console.log('mounted');
+        var canvas = document.getElementById('canvas1');
+        canvasDisplayFunctions.displayLegend(canvas, this.barsToDisplay, this.startBar, this.ticksPerBar);
     },
   }
 </script>
+
