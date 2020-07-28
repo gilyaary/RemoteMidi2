@@ -29,7 +29,8 @@
                 Tracks: {{fileInfo.loadedSequence.trackCount}}
             </div>
             -->
-            <canvas id="canvas1" width="1200" height="30"></canvas><br>
+            <!-- <canvas id="canvas1" width="1200" height="30"></canvas><br> -->
+            <legend-display :track="ti" :start="startBar" :bars="barsToDisplay" :ticks="ticksPerBar"/>
             <!-- fileInfo.loadedSequence.trackInfo[0].events[0].message -->
             <!--
             <span>Event Count: {{ti.eventCount}}</span>
@@ -55,6 +56,7 @@
 <script>
   
   import TrackDisplay from './TrackDisplay.vue'
+  import LegendDisplay from './LegendDisplay.vue'
   import Home from './Home.vue'
   import Vue from 'vue'
   import axios from 'axios'
@@ -91,17 +93,17 @@
         },
     },
     components: {
-        TrackDisplay
+        TrackDisplay, LegendDisplay
     },
     updated: function(){
         console.log('updated');
-        var canvas = document.getElementById('canvas1');
-        canvasDisplayFunctions.displayLegend(canvas, this.barsToDisplay, this.startBar, this.ticksPerBar);
+        //var canvas = document.getElementById('canvas1');
+        //canvasDisplayFunctions.displayLegend(canvas, this.barsToDisplay, this.startBar, this.ticksPerBar);
     },
     mounted: function(){
         console.log('mounted');
-        var canvas = document.getElementById('canvas1');
-        canvasDisplayFunctions.displayLegend(canvas, this.barsToDisplay, this.startBar, this.ticksPerBar);
+        //var canvas = document.getElementById('canvas1');
+        //canvasDisplayFunctions.displayLegend(canvas, this.barsToDisplay, this.startBar, this.ticksPerBar);
     },
   }
 </script>
