@@ -3,7 +3,9 @@ import VueRouter from  'vue-router'
 import Home from './views/Home.vue'
 import Files from './views/Files.vue'
 import Tracks from './views/Tracks.vue'
+//import VueWebsocket from "vue-websocket";
 
+//Vue.use(VueWebsocket, "ws://localhost:8080");
 Vue.use(VueRouter);
 
 const routes = [

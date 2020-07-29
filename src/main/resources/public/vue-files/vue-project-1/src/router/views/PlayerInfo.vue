@@ -1,38 +1,48 @@
 <template>
   <div>
     <div>
-        <p>Position:</p>
-        {{song_position}}
-    </div>
-    <div>
         <p>Midi Devices:</p>
-        {{midi_devices}}
+        {{midiDevices}}
     </div>
   </div>
 </template>
 
 <script>
   //import Files from './Files.vue'
+  import axios from 'axios'
   export default {
     name: 'player-info',
     data: () => {
         return {
-            song_position: 1,
-            midi_devices: {},        
+            midiDevices: {},        
         };
     },
     methods: {
-        
+      // $.get( "/sequencer/ports", function( data ) {
+      //     //alert( data );
+      //     player_control_app.setMidiDevices(data);
+      // });
+      getMidiDeviceInfo: function() {
+          console.log('getMidiDevicedInfo()');
+          let url = 'http://localhost:8080/sequencer/ports';
+          axios.get(url).then ((responseData) => {
+              //TODO: Parse the JSON and display correctly
+              this.midiDevices = responseData.data;
+          });
+      },
+      
     },
     components: {
         //uncomment to see files in home page
         //Files
     },
-    updated: function(){
-        console.log('updated');
+    mounted: function (){
+        console.log('mounted()');
+        this.getMidiDeviceInfo();
     },
-    mounted: function(){
-        console.log('mounted');
-    },
+    updated: function () {
+        console.log('updated()');
+        this.getMidiDeviceInfo();
+    },      
   }
 </script>

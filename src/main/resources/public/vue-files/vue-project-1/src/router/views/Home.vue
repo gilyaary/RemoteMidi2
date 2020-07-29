@@ -1,6 +1,6 @@
 <template>
   <div>
-      <files></files><br><br>
+      <!-- <files></files><br><br> -->
       <player-control></player-control><hr><br><br>
       <player-position></player-position><hr><br><br>
       <player-info></player-info><hr><br><br>
@@ -8,7 +8,7 @@
 </template>
 
 <script>
-  import Files from './Files.vue'
+  //import Files from './Files.vue'
   import PlayerControl from './PlayerControl.vue'
   import PlayerPosition from './PlayerPosition.vue'
   import PlayerInfo from './PlayerInfo.vue'

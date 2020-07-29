@@ -2,24 +2,39 @@
   <div>
     <div class="widget">
         <h1>Sequencer Widget Buttons</h1>
-        <button id="play">Play</button>
-        <button id="stop">Stop</button>
-        <button id="info">Info</button>
+        <button id="play" @click="play">Play</button>
+        <button id="stop" @click="stop">Stop</button>
     </div>
 </div>
 </template>
 
 <script>
   //import Files from './Files.vue'
+  import axios from 'axios'
+  var loaded = 0;
   export default {
     name: 'player-control',
     data: () => {
         return {
-            
+            loaded: 0,
         };
     },
     methods: {
-        
+          play: ()=>{
+              var url = loaded == 0 ? "http://localhost:8080/sequencer/play" : "/sequencer/resume";
+              let responseData = axios.put(url, {}).then((responseData) => {
+                  loaded == 1        
+              });
+          },
+          stop: ()=>{
+              var url =  "http://localhost:8080/sequencer/stop";
+              let responseData = axios.put(url, {}).then((responseData) => {
+                      
+              });            
+          },
+        // axios.get(url).then ((responseData) => {
+        //     this.fileInfo.files = responseData.data;
+        // });
     },
     components: {
         //uncomment to see files in home page
