@@ -1,6 +1,8 @@
 <template>
   <div>
-      <div id="slider"></div>
+      <div id="slider">
+          <vue-slider v-model="song_position"></vue-slider>
+      </div>
       <div>
         <p>Position: {{song_position}}</p>
         <p>Message: {{message}}</p>

@@ -3,9 +3,11 @@ import VueRouter from  'vue-router'
 import Home from './views/Home.vue'
 import Files from './views/Files.vue'
 import Tracks from './views/Tracks.vue'
-//import VueWebsocket from "vue-websocket";
+import VueSlider from 'vue-slider-component'
+import 'vue-slider-component/theme/default.css'
 
-//Vue.use(VueWebsocket, "ws://localhost:8080");
+//adding a global component
+Vue.component('VueSlider', VueSlider)
 Vue.use(VueRouter);
 
 const routes = [
