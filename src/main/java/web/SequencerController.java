@@ -88,13 +88,13 @@ public class SequencerController {
     @GetMapping("/sequencer/position")
     @RequestMapping(value = "/sequencer/position", method = RequestMethod.GET)
     public Long getPosition() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
-        return sequencerManager.getMicrosecondPosition();
+        return sequencerManager.getTicksPosition();
     }
 
     @PutMapping("/sequencer/position")
     @RequestMapping(value = "/sequencer/position", method = RequestMethod.PUT)
     public void setPosition(@RequestParam Integer position) throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
-        sequencerManager.setMicrosecondPosition(position);
+        sequencerManager.setTickPosition(position);
     }
 
     @PostMapping("/sequencer/track")

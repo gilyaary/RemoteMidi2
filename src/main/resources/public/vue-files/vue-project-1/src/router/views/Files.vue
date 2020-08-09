@@ -18,6 +18,9 @@
             Ticks: {{fileInfo.loadedSequence.tickLength}}
         </div>
         <div>
+            Resolution: {{fileInfo.loadedSequence.resolution}}
+        </div>
+        <div>
             Time: {{fileInfo.loadedSequence.microsecondLength}}
         </div>
         <div>

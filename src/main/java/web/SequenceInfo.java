@@ -10,12 +10,21 @@ public class SequenceInfo {
     public final long microsecondLength;
     public final int trackCount;
     public final TrackInfo[] trackInfo;
+    public final int resolution;
 
     public SequenceInfo(Sequence sequence) {
         Track[] tracks = sequence.getTracks();
         this.tickLength =sequence.getTickLength();
         Patch[] patches = sequence.getPatchList();
         this.microsecondLength =sequence.getMicrosecondLength();
+        this.resolution = sequence.getResolution();
+        float divisionType = sequence.getDivisionType();
+        //this is How many Ticks in one Quarter Note (1 Beat)
+        int resolution = sequence.getResolution();
+        //Tempo is actually a Midi message.
+        //The user can record tempo changes
+        
+        
         this.trackCount = tracks.length;
         this.trackInfo = new TrackInfo[trackCount];
         for(int i=0; i<trackCount; i++){

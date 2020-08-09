@@ -242,6 +242,7 @@ public class LgSequencer implements Sequencer {
     @Override
     public void setTickPosition(long tick) {
         //todo: let the runnable handle this
+        sequencerRunnable.setSongPositionTicks(tick);
     }
 
     @Override

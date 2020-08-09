@@ -23,6 +23,14 @@
             message: {},
         };
     },
+    props: {
+        position: Number //parent will change the value of this component position property
+    },
+    watch: {
+        position: function(){
+            this.song_position = this.position; //we will change a data element by the position property value
+        }
+    },
     methods: {
         sendMessage: function(message) {
           //console.log(this.connection);
@@ -46,24 +54,6 @@
         console.log('mounted');
     },
     created: function() {
-        console.log("Starting connection to WebSocket Server")
-        this.connection = new WebSocket("ws://localhost:8080/song_status")
-        var player_control_app = this;
-
-        this.connection.onmessage = function(event) {
-            //console.log(event);
-            var value = parseInt(event.data, 10) / 1000000;
-            //player_control_app.setMessage(event.data);
-            player_control_app.setSongPosition(value);
-            //slider.slider( "value", value );
-            //this.message = {test:2};
-        }
-
-        this.connection.onopen = function(event) {
-            //console.log(event)
-            //console.log("Successfully connected to the echo websocket server...")
-            //this.message = {test:1};
-        }
 
     },
 

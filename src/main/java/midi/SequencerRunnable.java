@@ -187,6 +187,15 @@ public class SequencerRunnable implements Runnable{
         this.beatsPerMinute = tempoInBPM;
     }
 
+    public void setSongPositionTicks(long ticks) {
+        int resolution = this.sequencerContext.sequence.getResolution();
+        double beatsPerSecond = (double) (beatsPerMinute) / 60.00;
+        double ticksPerSecond = beatsPerSecond * resolution; //resolution is how many ticks we have in a single beat
+        double singleTickTime = 1.00 / ticksPerSecond;
+        long songPositionMs = (long) (ticks * singleTickTime * 1000);
+        setSongPositionMs(songPositionMs);
+    }
+
     public void setSongPositionMs(long songPositionMs) {
         this.songPositionMs = songPositionMs;
         //TODO: Pack all this info into one object. Also create a method that does these calcualtions

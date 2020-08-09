@@ -35,13 +35,13 @@
               });            
           },
           setPosition: () => {
+              /*
               let url = "http://localhost:8080/sequencer/position";
-              //let data = {'position': this.position};
-              //console.log(this.loaded);
               let data = 'position=' + this.position;
               let responseData = axios.put(url, data).then((responseData) => {
                   //loaded == 1        
               });
+              */
           },
         // axios.get(url).then ((responseData) => {
         //     this.fileInfo.files = responseData.data;

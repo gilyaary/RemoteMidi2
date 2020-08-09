@@ -7,9 +7,24 @@
         <div>
             Start Bar: <input v-model.number="startBar" type="number" />
         </div>
-        <div>
-            Ticks Per Bar: <input v-model.number="ticksPerBar" type="number" />
-        </div>
+       
+<!--
+<div v-if="fileInfo && fileInfo.loadedSequence">
+    <div>
+        Ticks: {{fileInfo.loadedSequence.tickLength}}
+    </div>
+    <div>
+        Resolution: {{fileInfo.loadedSequence.resolution}}
+    </div>
+    <div>
+        Time: {{fileInfo.loadedSequence.microsecondLength}}
+    </div>
+    <div>
+        Tracks: {{fileInfo.loadedSequence.trackCount}}
+    </div>
+</div>
+-->
+
         <div>
             <button v-on:click="getSequenceInfo">Display Sequence</button>
         </div>
@@ -30,7 +45,7 @@
             </div>
             -->
             <!-- <canvas id="canvas1" width="1200" height="30"></canvas><br> -->
-            <legend-display :track="ti" :start="startBar" :bars="barsToDisplay" :ticks="ticksPerBar"/>
+            <legend-display :track="ti" :start="startBar" :bars="barsToDisplay" :position="position" :sequence="fileInfo.loadedSequence"/>
             <!-- fileInfo.loadedSequence.trackInfo[0].events[0].message -->
             <!--
             <span>Event Count: {{ti.eventCount}}</span>
@@ -39,7 +54,7 @@
             <!-- div v-for="ev in ti.events">
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>{{ev}}</span>
             </div -->
-            <track-display v-bind:key="ti.ticks" v-for="ti in fileInfo.loadedSequence.trackInfo" :track="ti" :start="startBar" :bars="barsToDisplay" :ticks="ticksPerBar"/>
+            <track-display v-bind:key="ti" v-for="ti in fileInfo.loadedSequence.trackInfo" :position="position" :track="ti" :start="startBar" :bars="barsToDisplay" :ticks="ticksPerBar" :sequence="fileInfo.loadedSequence"/>
         </div>
         <br><br>
     </div>
@@ -67,13 +82,10 @@
     data: () => {
         return {
             fileInfo: {
-                loadedSequence: {
-                    
-                }
+                loadedSequence: null,
             },
             barsToDisplay: 2,
             startBar:1,
-            ticksPerBar: 32,
             message: 'Tracks.vue',
         };
     },
@@ -92,6 +104,14 @@
             });
         },
     },
+    props: {
+        position: Number //parent will change the value of this component position property
+    },
+    watch: {
+        // position: function(){
+        //     this.song_position = this.position; //we will change a data element by the position property value
+        // }
+    },
     components: {
         TrackDisplay, LegendDisplay
     },
@@ -99,11 +119,15 @@
         console.log('updated');
         //var canvas = document.getElementById('canvas1');
         //canvasDisplayFunctions.displayLegend(canvas, this.barsToDisplay, this.startBar, this.ticksPerBar);
+        //this.getSequenceInfo();
     },
     mounted: function(){
         console.log('mounted');
         //var canvas = document.getElementById('canvas1');
         //canvasDisplayFunctions.displayLegend(canvas, this.barsToDisplay, this.startBar, this.ticksPerBar);
+    },
+    created: function(){
+        this.getSequenceInfo();
     },
   }
 </script>

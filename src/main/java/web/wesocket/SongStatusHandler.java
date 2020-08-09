@@ -20,7 +20,7 @@ public class SongStatusHandler implements WebSocketHandler{
         while(session.isOpen()){
             try {
                 if(lgSequencer != null) {
-                    long position = lgSequencer.getMicrosecondPosition();
+                    long position = lgSequencer.getTickPosition();
                     String msg = Long.toString(position);
                     WebSocketMessage<?> msm = new TextMessage(msg);
                     session.sendMessage(msm);

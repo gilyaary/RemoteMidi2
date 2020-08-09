@@ -190,6 +190,10 @@ public class LgSequencerManager {
         this.sequencer.setMicrosecondPosition(i);
     }
 
+    public void setTickPosition(int i) {
+        this.sequencer.setTickPosition(i);
+    }
+
     public void start() {
         this.sequencer.start();
     }
@@ -200,6 +204,10 @@ public class LgSequencerManager {
 
     public Long getMicrosecondPosition() {
         return this.sequencer.getMicrosecondPosition();
+    }
+
+    public Long getTicksPosition() {
+        return this.sequencer.getTickPosition();
     }
 
 
