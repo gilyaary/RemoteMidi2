@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>jQuery UI Button - Default functionality</title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+
+    <link rel="stylesheet" href="css/slider_css.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+
+
+    <script src="scripts/player_control.js"></script>
+</head>
+<body>
+<div class="widget">
+    <h1>Sequencer Widget Buttons</h1>
+    <button id="play">Play</button>
+    <button id="stop">Stop</button>
+    <button id="info">Info</button>
+</div>
+</br></br></br>
+
+<div id="slider"></div>
+
+<div id="player_control_app">
+    <div>
+        <p>Position:</p>
+        {{song_position}}
+    </div>
+    <div>
+        <p>Midi Devices:</p>
+        {{midi_devices}}
+    </div>
+</div>
+
+<div>
+    <a href="tracks.html">Tracks</a>
+</div>
+<br><br>
+<div>
+    <a href="score.html">Score</a>
+</div>
+
+</body>
+</html>

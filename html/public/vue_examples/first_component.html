@@ -1,0 +1,100 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Vue</title>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+  <style type="text/css">
+    body {
+      background: #20262E;
+      padding: 20px;
+      font-family: Helvetica;
+    }
+    button{
+        border-radius: 10px 
+    }
+    .entryHolder{
+      background: #0f0;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      padding: 20px;
+      transition: all 0.2s;
+    }
+    .entrySection{
+      padding: 2px;
+    }
+    #gil_app_1 {
+      background: #fff;
+      border-radius: 4px;
+      padding: 20px;
+      transition: all 0.2s;
+    }
+
+    li {
+      margin: 8px 0;
+    }
+
+    h2 {
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    del {
+      color: rgba(0, 0, 0, 0.3);
+    }
+  </style>
+</head>
+
+<body>
+<div id="gil_app_1">
+    <div v-for="name in names">
+        <person_form :person="name" />
+    </div>
+</div>
+
+`<script type="text/javascript">
+ Vue.component('person_form', {
+     props: ['person'],
+     methods: {
+        remove: function(){
+            alert('remove called');
+        }
+     },
+     updated: function(){
+          this.$el.style.background = 'red';
+     },
+    template: `
+       <div class="entryHolder">
+          <div class="entrySection">
+              {{person.first}}
+          </div>
+          <div class="entrySection">
+              {{person.last}}
+          </div>
+          <div class="entrySection">
+            <button v-on:click="remove(person.first)">
+                Remove
+            </button>
+          </div>
+        </div>   
+     `
+  })
+
+app1 = new Vue({
+    el: "#gil_app_1",
+    data: {
+      names:[
+          {first: 'Gil', last:'Yaary'}, 
+          {first: 'Lilach', last:'Yaary'},
+      ]   
+    },
+    methods: {
+    
+    },
+    filters: {
+
+    },
+    components:['person_form']
+    
+})
+</script>
+</body>

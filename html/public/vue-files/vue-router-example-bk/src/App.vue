@@ -1,10 +1,11 @@
 <template>
   <div id="app">
+    <HelloWorld msg="Welcome GIL to Your Vue.js App"/>
+    
     <nav>
-      <!-- the 'to' property is bound to the 'path' property in router/index.js-->
-      <router-link to="/"><button class="menu">Home</button></router-link>
-      <router-link to="/files"><button class="menu">Files</button></router-link>
-      <router-link to="/tracks"><button class="menu">Tracks</button></router-link>
+      <router-link to="/">Home</router-link>
+      <router-link to="/about">About</router-link>
+      <router-link to="/hello">HelloWorld</router-link>
     </nav>
     <router-view></router-view>
     
@@ -12,10 +13,13 @@
 </template>
 
 <script>
+import HelloWorld from './components/HelloWorld.vue'
+
+
 export default {
   name: 'App',
   components: {
-      
+    HelloWorld
   }
 }
 </script>
@@ -28,10 +32,5 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
-}
-.menu{
-  margin-right: 30px;
-  font-size: 30px;
-
 }
 </style>

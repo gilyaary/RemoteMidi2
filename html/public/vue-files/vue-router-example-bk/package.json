@@ -12,9 +12,7 @@
     "core-js": "^3.6.5",
     "vue": "^2.6.11",
     "vue-axios": "^2.1.5",
-    "vue-router": "^3.4.2",
-    "vue-slider-component": "^3.2.3",
-    "vue-websocket": "^0.2.3",
+    "vue-router": "^3.3.4",
     "vuex": "^3.5.1"
   },
   "devDependencies": {
@@ -38,9 +36,7 @@
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "rules": {
-      "no-unused-vars": "off"
-    }
+    "rules": {}
   },
   "browserslist": [
     "> 1%",
