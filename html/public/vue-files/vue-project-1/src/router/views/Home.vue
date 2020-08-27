@@ -2,9 +2,9 @@
   <div>
       <div class="float-left-child control">
           <!-- <files></files><br><br> -->
-          <player-control></player-control><hr><br><br>
-          <player-position :position="position"></player-position><hr><br><br>
-          <player-info></player-info><hr><br><br>
+          <player-control  :position="position"></player-control><hr><br><br>
+          <!-- <player-position :position="position"></player-position><hr><br><br> -->
+          <player-info  :position="position"></player-info><hr><br><br>
       </div>
       <div class="float-left-child tracks">
           <tracks :position="position"/>        
@@ -34,18 +34,19 @@
   export default {
     data: () => {
         return {
-            position: 100
+            position: 2
         };
     },
     methods: {
-        setSongPosition: function(pos){
-            this.position = pos;
+        setSongPosition: function(value){
+            this.position = value;
         }
     },
     components: {
         //uncomment to see files in home page
         //Files
-        PlayerControl, PlayerPosition, PlayerInfo, Tracks 
+        PlayerControl, PlayerInfo, Tracks,
+        //PlayerPosition,  
     },
     updated: function(){
         console.log('updated');

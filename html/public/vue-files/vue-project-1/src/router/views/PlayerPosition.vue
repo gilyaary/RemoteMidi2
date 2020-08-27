@@ -1,7 +1,7 @@
 <template>
   <div>
       <div id="slider">
-          <vue-slider v-model="song_position"></vue-slider>
+          <vue-slider v-model="song_position" min="0" max="100000"></vue-slider>
       </div>
       <div>
         <p>Position: {{song_position}}</p>
@@ -24,7 +24,7 @@
         };
     },
     props: {
-        position: Number //parent will change the value of this component position property
+        //position: 0 //parent will change the value of this component position property
     },
     watch: {
         position: function(){

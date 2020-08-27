@@ -6,6 +6,15 @@
         <button id="stop" class="player-control" @click="stop">Stop</button>
         <button id="setPosition" class="player-control" @click="setPosition">Set position</button>
     </div>
+    <div>
+        <div id="slider">
+            <vue-slider v-model="position" min="0" max="100000"></vue-slider>
+        </div>
+        <div>
+            <p>Position: {{position}}</p>
+            <p>Message: {{message}}</p>
+        </div>
+    </div>
 </div>
 </template>
 <style scoped>
@@ -24,35 +33,42 @@
     data: () => {
         return {
             loaded: 0,
-            position: 80,
+            connection: null,
+            message: {},
         };
     },
+    props: ['position'],
+    //the issue is that whis watch never gets called. Maybe it should be called only when there are changes to values
+    
     methods: {
-          play: () => {
-              let url = loaded == 0 ? "http://localhost:8080/sequencer/play" : "/sequencer/resume";
+          play: function() {
+              let url = (!this.loaded || this.loaded == 0) ? "http://localhost:8080/sequencer/play" : "http://localhost:8080/sequencer/resume";
+              //let url = "http://localhost:8080/sequencer/resume";
               let responseData = axios.put(url, {}).then((responseData) => {
-                  loaded == 1        
+                  this.loaded = 1;        
+                  console.log('play returned');
               });
           },
-          stop: () => {
+          stop: function() {
               let url =  "http://localhost:8080/sequencer/stop";
               let responseData = axios.put(url, {}).then((responseData) => {
-                      
+                  console.log('stop returned');    
               });            
           },
-          setPosition: () => {
-              /*
+          setPosition: function() {
               let url = "http://localhost:8080/sequencer/position";
-              let data = 'position=' + this.position;
-              let responseData = axios.put(url, data).then((responseData) => {
-                  //loaded == 1        
+              let payload = 'position=' + this.position;
+              let responseData = axios.put(url, payload).then((responseData) => {
+                  this.loaded = 1; 
+                  console.log('setPosition returned');       
               });
-              */
           },
+          
         // axios.get(url).then ((responseData) => {
         //     this.fileInfo.files = responseData.data;
         // });
     },
+    
     components: {
         //uncomment to see files in home page
         //Files

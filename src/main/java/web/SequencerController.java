@@ -57,6 +57,7 @@ public class SequencerController {
     public String play() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
         //String midi_file = "/home/gil/Music/gil_music.mid";
         //sequencerManager.loadSequenceFromFileSystem(midi_file);
+        System.out.println("\n\nSequencerController.play() called\n\n");
         sequencerManager.setTempoInBPM(160);
         sequencerManager.setMicrosecondPosition(0);
         sequencerManager.start();
@@ -66,6 +67,7 @@ public class SequencerController {
     @PutMapping("/sequencer/resume")
     @RequestMapping(value = "/sequencer/resume", method = RequestMethod.PUT)
     public String resume() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
+        System.out.println("\n\nSequencerController.resume() called\n\n");
         sequencerManager.start();
         return "resumed";
     }
@@ -73,6 +75,7 @@ public class SequencerController {
     @PutMapping("/sequencer/stop")
     @RequestMapping(value = "/sequencer/stop", method = RequestMethod.PUT)
     public String stop() throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
+        System.out.println("\n\nSequencerController.stop() called\n\n");
         sequencerManager.stop();
         return "stopped";
     }
@@ -94,6 +97,7 @@ public class SequencerController {
     @PutMapping("/sequencer/position")
     @RequestMapping(value = "/sequencer/position", method = RequestMethod.PUT)
     public void setPosition(@RequestParam Integer position) throws MidiUnavailableException, InvalidMidiDataException, IOException, InterruptedException {
+        System.out.println("\n\nSequencerController.position() called. Setting Position to: " + position + "\n\n");
         sequencerManager.setTickPosition(position);
     }
 
