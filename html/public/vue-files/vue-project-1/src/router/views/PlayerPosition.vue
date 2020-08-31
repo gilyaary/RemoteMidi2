@@ -6,8 +6,8 @@
       <div>
         <p>Position: {{song_position}}</p>
         <p>Message: {{message}}</p>
+        State Name: {{playerControlSequencerState}}
       </div>
-    
   </div>
 </template>
 

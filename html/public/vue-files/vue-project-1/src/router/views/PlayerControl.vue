@@ -15,9 +15,10 @@
         <div>
             <p>Position: {{position}}</p>
             <p>Message: {{message}}</p>
+            State Name: {{playerControlSequencerState}}
         </div>
     </div>
-    State Name: {{stateName}}
+    
 </div>
 </template>
 <style scoped>
@@ -27,7 +28,7 @@
         font-size: 20px;
     }
 </style>
-<script lang="ts">
+<script>
 
 /*
     TODO:
@@ -58,8 +59,8 @@
 
 //import Files from './Files.vue'
   import axios from 'axios'
-  import {ApplicationState} from '../applicationState'
-  import {Subscriber} from '../subscriber'
+  import ApplicationState from '../applicationState'
+  import Subscriber from '../subscriber'
 
   var loaded = 0;
   export default {
@@ -70,7 +71,7 @@
             connection: null,
             message: {},
             state: 'PLAY',
-            stateName: null,
+            playerControlSequencerState: 'Stop',
         };
     },
     props: ['position'],
@@ -92,12 +93,14 @@
                   this.loaded = 1;        
                   console.log('play returned');
               });
+              ApplicationState.getInstance().publish('playerControlSequencerState', 'Play');
           },
           stop: function() {
               let url =  "http://localhost:8080/sequencer/stop";
               let responseData = axios.put(url, {}).then((responseData) => {
                   console.log('stop returned'); 
                   this.state = 'STOP';    
+                  ApplicationState.getInstance().publish('playerControlSequencerState', 'Stop');
               });            
           },
           setPosition: function() {
@@ -108,10 +111,8 @@
                   console.log('setPosition returned');       
               });
           },
-          stateChanged(state, oldValue, newValue){
-              if(state === 'stateName'){
-                  this.stateName = newValue;
-              }
+          playerControlSequencerStateChanged: function(state, oldValue, newValue){
+              this.playerControlSequencerState = newValue;    
           },
           
         // axios.get(url).then ((responseData) => {
@@ -127,20 +128,13 @@
         console.log('updated');
     },
     mounted: function(){
+        this.stateName = 'Mounted';
         let instance = this;
         console.log('mounted');
-        let applicationState = new ApplicationState();
-        //applicationState.subscribe(
-            
-        //     'stateName', {
-        //     stateChanged: (state, oldValue, newValue) => {
-        //         console.log('state: ' + state + '\n' + 'Old Value: ' + oldValue + '\n' + 'New Value: ' + newValue);
-        //         instance.stateChanged(state, oldValue, newValue);
-        //     }
-        // });
-        applicationState.publishStateChange('stateName', '111');
-        applicationState.publishStateChange('stateName', '222');
-        applicationState.publishStateChange('stateName', '333');
+        
+        ApplicationState.getInstance().subscribeWithCallback(this.playerControlSequencerStateChanged, 
+            'playerControlSequencerState');
     },
+    
   }
 </script>

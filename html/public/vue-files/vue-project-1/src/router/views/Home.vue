@@ -1,6 +1,7 @@
 <template>
   <div>
       <div class="float-left-child control">
+          State Name: {{playerControlSequencerState}}
           <!-- <files></files><br><br> -->
           <player-control  :position="position"></player-control><hr><br><br>
           <!-- <player-position :position="position"></player-position><hr><br><br> -->
@@ -31,16 +32,22 @@
   import PlayerPosition from './PlayerPosition.vue'
   import PlayerInfo from './PlayerInfo.vue'
   import Tracks from './Tracks.vue'
+  import ApplicationState from '../applicationState'
+  import Subscriber from '../subscriber'
   export default {
     data: () => {
         return {
-            position: 2
+            position: 2,
+            playerControlSequencerState: '',
         };
     },
     methods: {
         setSongPosition: function(value){
             this.position = value;
-        }
+        },
+        playerControlSequencerStateChanged: function(state, oldValue, newValue){
+            this.playerControlSequencerState = newValue;    
+        },
     },
     components: {
         //uncomment to see files in home page
@@ -52,7 +59,9 @@
         console.log('updated');
     },
     mounted: function(){
-        console.log('mounted');
+        let instance = this;
+        ApplicationState.getInstance().subscribeWithCallback(this.playerControlSequencerStateChanged, 
+            'playerControlSequencerState');
     },
     created: function() {
         console.log("Starting connection to WebSocket Server")
