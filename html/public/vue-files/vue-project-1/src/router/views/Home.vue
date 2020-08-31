@@ -3,12 +3,12 @@
       <div class="float-left-child control">
            State Name: {{playerControlSequencerState}}
           <!-- <files></files><br><br> -->
-          <player-control  :position="position"></player-control><hr><br><br>
+          <player-control></player-control><hr><br><br>
           <!-- <player-position :position="position"></player-position><hr><br><br> -->
-          <player-info  :position="position"></player-info><hr><br><br>
+          <player-info></player-info><hr><br><br>
       </div>
       <div class="float-left-child tracks">
-          <tracks :position="position"/>        
+          <tracks/>        
       </div>
   </div>
 </template>
@@ -37,14 +37,11 @@
   export default {
     data: () => {
         return {
-            position: 2,
             playerControlSequencerState: '',
         };
     },
     methods: {
-        setSongPosition: function(value){
-            this.position = value;
-        },
+        
     },
     components: {
         //uncomment to see files in home page
@@ -84,7 +81,7 @@
 
             var value = parseInt(event.data, 10) ; /// 1000000
             //player_control_app.setSongPosition(value);
-            home.setSongPosition(value);
+            ApplicationState.getInstance().publish('playerPosition', value);
         }
 
         this.connection.onopen = function(event) {

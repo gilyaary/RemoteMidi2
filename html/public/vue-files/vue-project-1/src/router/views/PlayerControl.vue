@@ -13,7 +13,7 @@
             <vue-slider v-model="position" min="0" max="100000"></vue-slider>
         </div>
         <div>
-            <p>Position: {{position}}</p>
+            <p>Position: {{playerPostion}}</p>
             <p>Message: {{message}}</p>
             State Name: {{playerControlSequencerState}}
         </div>
@@ -72,9 +72,10 @@
             message: {},
             state: 'PLAY',
             playerControlSequencerState: 'Stop',
+            playerPostion: 0,
         };
     },
-    props: ['position'],
+    props: [],
     //the issue is that whis watch never gets called. Maybe it should be called only when there are changes to values
     watch: {
       position: function(){
@@ -136,6 +137,15 @@
                 },
             }, 
             'playerControlSequencerState');
+
+        ApplicationState.getInstance().subscribe(
+            {
+                stateChanged: function (state, oldValue, newValue) {
+                    console.info('Player Control got State event value: ' + newValue);
+                    instance.playerPostion = newValue;
+                },
+            }, 
+            'playerPosition');
 
         console.log('*************** PlayerControl subscribed *******************');
         

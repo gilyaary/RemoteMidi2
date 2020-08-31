@@ -45,7 +45,10 @@
             </div>
             -->
             <!-- <canvas id="canvas1" width="1200" height="30"></canvas><br> -->
-            <legend-display :track="ti" :start="startBar" :bars="barsToDisplay" :position="position" :sequence="fileInfo.loadedSequence"/>
+            
+            Player Postion: {{playerPostion}}
+            
+            <legend-display :track="ti" :start="startBar" :bars="barsToDisplay" :position="playerPosition" :sequence="fileInfo.loadedSequence"/>
             <!-- fileInfo.loadedSequence.trackInfo[0].events[0].message -->
             <!--
             <span>Event Count: {{ti.eventCount}}</span>
@@ -54,7 +57,7 @@
             <!-- div v-for="ev in ti.events">
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>{{ev}}</span>
             </div -->
-            <track-display v-bind:key="ti" v-for="ti in fileInfo.loadedSequence.trackInfo" :position="position" :track="ti" :start="startBar" :bars="barsToDisplay" :ticks="ticksPerBar" :sequence="fileInfo.loadedSequence"/>
+            <track-display v-bind:key="ti" v-for="ti in fileInfo.loadedSequence.trackInfo" :position="playerPosition" :track="ti" :start="startBar" :bars="barsToDisplay" :ticks="ticksPerBar" :sequence="fileInfo.loadedSequence"/>
         </div>
         <br><br>
     </div>
@@ -80,6 +83,9 @@
   import axios from 'axios'
 
   import * as canvasDisplayFunctions from '../canvas_display.js' 
+  import ApplicationState from '../applicationState'
+  import Subscriber from '../subscriber'
+
 
   export default {
     data: () => {
@@ -90,6 +96,7 @@
             barsToDisplay: 2,
             startBar:1,
             message: 'Tracks.vue',
+            playerPosition: 0,
         };
     },
     methods: {
@@ -108,11 +115,11 @@
         },
     },
     props: {
-        position: Number //parent will change the value of this component position property
+        
     },
     watch: {
-        // position: function(){
-        //     this.song_position = this.position; //we will change a data element by the position property value
+        // playerPosition: function(){
+        //      //this.song_position = this.position; //we will change a data element by the position property value
         // }
     },
     components: {
@@ -126,8 +133,20 @@
     },
     mounted: function(){
         console.log('mounted');
+        let instance = this;
         //var canvas = document.getElementById('canvas1');
         //canvasDisplayFunctions.displayLegend(canvas, this.barsToDisplay, this.startBar, this.ticksPerBar);
+        ApplicationState.getInstance().subscribe(
+            {
+                stateChanged: function (state, oldValue, newValue) {
+                    console.info('Tracks got State event value: ' + newValue);
+                    instance.playerPosition = newValue;
+                },
+            }, 
+            'playerPosition');
+
+        console.log('*************** Tracks subscribed *******************');
+        
     },
     created: function(){
         this.getSequenceInfo();
