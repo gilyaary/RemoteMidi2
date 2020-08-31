@@ -111,10 +111,6 @@
                   console.log('setPosition returned');       
               });
           },
-          playerControlSequencerStateChanged: function(state, oldValue, newValue){
-              this.playerControlSequencerState = newValue;    
-          },
-          
         // axios.get(url).then ((responseData) => {
         //     this.fileInfo.files = responseData.data;
         // });
@@ -132,8 +128,17 @@
         let instance = this;
         console.log('mounted');
         
-        ApplicationState.getInstance().subscribeWithCallback(this.playerControlSequencerStateChanged, 
+        ApplicationState.getInstance().subscribe(
+            {
+                stateChanged: function (state, oldValue, newValue) {
+                    console.info('Player Control got State event value: ' + newValue);
+                    instance.playerControlSequencerState = newValue;
+                },
+            }, 
             'playerControlSequencerState');
+
+        console.log('*************** PlayerControl subscribed *******************');
+        
     },
     
   }

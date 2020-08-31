@@ -1,7 +1,7 @@
 <template>
   <div>
       <div class="float-left-child control">
-          State Name: {{playerControlSequencerState}}
+           State Name: {{playerControlSequencerState}}
           <!-- <files></files><br><br> -->
           <player-control  :position="position"></player-control><hr><br><br>
           <!-- <player-position :position="position"></player-position><hr><br><br> -->
@@ -45,9 +45,6 @@
         setSongPosition: function(value){
             this.position = value;
         },
-        playerControlSequencerStateChanged: function(state, oldValue, newValue){
-            this.playerControlSequencerState = newValue;    
-        },
     },
     components: {
         //uncomment to see files in home page
@@ -57,11 +54,23 @@
     },
     updated: function(){
         console.log('updated');
+        
     },
     mounted: function(){
         let instance = this;
-        ApplicationState.getInstance().subscribeWithCallback(this.playerControlSequencerStateChanged, 
+        // ApplicationState.getInstance().subscribeWithCallback(this.playerControlSequencerStateChanged, 
+        //     'playerControlSequencerState');
+
+        ApplicationState.getInstance().subscribe(
+            {
+                stateChanged: function (state, oldValue, newValue) {    
+                    console.info('Home got State event value: ' + newValue);
+                    instance.playerControlSequencerState = newValue;
+                },
+            }, 
             'playerControlSequencerState');
+
+        console.log('**************** Home subscribed ');
     },
     created: function() {
         console.log("Starting connection to WebSocket Server")
