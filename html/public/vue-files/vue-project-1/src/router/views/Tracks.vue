@@ -45,10 +45,7 @@
             </div>
             -->
             <!-- <canvas id="canvas1" width="1200" height="30"></canvas><br> -->
-            
-            Player Postion: {{playerPostion}}
-            
-            <legend-display :track="ti" :start="startBar" :bars="barsToDisplay" :position="playerPosition" :sequence="fileInfo.loadedSequence"/>
+            <legend-display v-on:mouseUp="mouseUp($event)" v-on:mouseDown="mouseDown($event)" :track="ti" :start="startBar" :bars="barsToDisplay" :position="playerPosition" :sequence="fileInfo.loadedSequence"/>
             <!-- fileInfo.loadedSequence.trackInfo[0].events[0].message -->
             <!--
             <span>Event Count: {{ti.eventCount}}</span>
@@ -113,6 +110,12 @@
                 this.fileInfo.loadedSequence = responseData.data;
             });
         },
+        mouseDown(event){
+            console.info('mouse down');
+        },
+        mouseUp(event){
+            console.info('mouse up');
+        },
     },
     props: {
         
@@ -139,7 +142,7 @@
         ApplicationState.getInstance().subscribe(
             {
                 stateChanged: function (state, oldValue, newValue) {
-                    console.info('Tracks got State event value: ' + newValue);
+                    //console.info('Tracks got State event value: ' + newValue);
                     instance.playerPosition = newValue;
                 },
             }, 

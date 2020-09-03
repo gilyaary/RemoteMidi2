@@ -141,7 +141,7 @@
         ApplicationState.getInstance().subscribe(
             {
                 stateChanged: function (state, oldValue, newValue) {
-                    console.info('Player Control got State event value: ' + newValue);
+                    //console.info('Player Control got State event value: ' + newValue);
                     instance.playerPostion = newValue;
                 },
             }, 

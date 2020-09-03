@@ -74,6 +74,7 @@
         this.connection = new WebSocket("ws://localhost:8080/song_status")
         //var player_control_app = this;
         var home = this;
+        let instance = this;
 
         this.connection.onmessage = function(event) {
             //player_control_app.setMessage(event.data);
@@ -81,7 +82,11 @@
 
             var value = parseInt(event.data, 10) ; /// 1000000
             //player_control_app.setSongPosition(value);
-            ApplicationState.getInstance().publish('playerPosition', value);
+            //console.log(instance.playerControlSequencerState);
+            if(instance.playerControlSequencerState === 'Play'){
+                ApplicationState.getInstance().publish('playerPosition', value);
+                //console.log("Got Position: " + value);
+            }
         }
 
         this.connection.onopen = function(event) {
