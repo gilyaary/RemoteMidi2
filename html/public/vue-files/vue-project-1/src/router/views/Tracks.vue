@@ -52,7 +52,7 @@
                 :bars="barsToDisplay" 
                 :position="playerPosition" 
                 :sequence="fileInfo.loadedSequence"
-                :width="1200"
+                :width="width"
                 :height="100"
             />
             <!-- fileInfo.loadedSequence.trackInfo[0].events[0].message -->
@@ -72,7 +72,7 @@
                 :bars="barsToDisplay" 
                 :ticks="ticksPerBar" 
                 :sequence="fileInfo.loadedSequence"
-                :width="1200"
+                :width="width"
                 :height="300"
             />
         </div>
@@ -138,12 +138,12 @@
         },
     },
     props: {
-        
+        width: Number, 
+        height: Number,
     },
     watch: {
-        // playerPosition: function(){
-        //      //this.song_position = this.position; //we will change a data element by the position property value
-        // }
+        width: function(){},
+        height: function(){}
     },
     components: {
         TrackDisplay, LegendDisplay
@@ -153,6 +153,8 @@
         //var canvas = document.getElementById('canvas1');
         //canvasDisplayFunctions.displayLegend(canvas, this.barsToDisplay, this.startBar, this.ticksPerBar);
         //this.getSequenceInfo();
+        //this.width = 1000;
+        //this.height = 1000;
     },
     mounted: function(){
         console.log('mounted');

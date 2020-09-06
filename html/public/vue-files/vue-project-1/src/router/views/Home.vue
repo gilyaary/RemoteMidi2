@@ -1,6 +1,6 @@
 <template>
   <div>
-      <div class="float-left-child control">
+      <div class="float-left-child control" style="float:left;width:100px" :width="getTrackWidth()">
            State Name: {{playerControlSequencerState}}
            lockPositionChanges: {{lockPositionChanges}}
           <!-- <files></files><br><br> -->
@@ -8,8 +8,8 @@
           <!-- <player-position :position="position"></player-position><hr><br><br> -->
           <player-info></player-info><hr><br><br>
       </div>
-      <div class="float-left-child tracks">
-          <tracks/>        
+      <div class="float-left-child tracks" style="float:left; width:100px;">
+          <tracks :width="getTrackWidth()" :height="100"></tracks>        
       </div>
   </div>
 </template>
@@ -18,11 +18,10 @@
         float: left;
     }
     .control {
-        width: 200px;
         margin-right: 100px;
     }
     .tracks {
-        width: 800px;
+        
     }
     
 </style>
@@ -43,7 +42,12 @@
         };
     },
     methods: {
-        
+        getTrackWidth(){
+            return window.innerWidth - 300;
+        },
+        getContolWidth(){
+            return window.innerWidth * 0.25;
+        },
     },
     components: {
         //uncomment to see files in home page
