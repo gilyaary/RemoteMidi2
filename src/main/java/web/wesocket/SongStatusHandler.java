@@ -24,7 +24,15 @@ public class SongStatusHandler implements WebSocketHandler{
                     String msg = Long.toString(position);
                     WebSocketMessage<?> msm = new TextMessage(msg);
                     session.sendMessage(msm);
-                    Thread.sleep(100);
+
+                    //it looks like javascript cannot keep up with higher speeds than once/second
+                    //is this a Java issue? or Browser/Javascript/Vue/Canvas issue?
+                    //One thing to consider is that event notification is serial
+                    //so if the canvas takes a long time to refresh then the position too will be updated late
+                    //Also: consider putting messages in a queue to ensure the following:
+                    //    1. In order notification
+                    //    2. Removal of old messages when queue is full
+                    Thread.sleep(1000);
                 }
             }catch(Exception e){
                 session.close();

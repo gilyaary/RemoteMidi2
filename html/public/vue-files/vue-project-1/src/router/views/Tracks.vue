@@ -45,7 +45,16 @@
             </div>
             -->
             <!-- <canvas id="canvas1" width="1200" height="30"></canvas><br> -->
-            <legend-display v-on:mouseUp="mouseUp($event)" v-on:mouseDown="mouseDown($event)" :track="ti" :start="startBar" :bars="barsToDisplay" :position="playerPosition" :sequence="fileInfo.loadedSequence"/>
+            <legend-display 
+                v-on:mouseUp="mouseUp($event)" 
+                v-on:mouseDown="mouseDown($event)" 
+                :track="ti" :start="startBar" 
+                :bars="barsToDisplay" 
+                :position="playerPosition" 
+                :sequence="fileInfo.loadedSequence"
+                :width="1200"
+                :height="100"
+            />
             <!-- fileInfo.loadedSequence.trackInfo[0].events[0].message -->
             <!--
             <span>Event Count: {{ti.eventCount}}</span>
@@ -54,7 +63,18 @@
             <!-- div v-for="ev in ti.events">
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>{{ev}}</span>
             </div -->
-            <track-display v-bind:key="ti" v-for="ti in fileInfo.loadedSequence.trackInfo" :position="playerPosition" :track="ti" :start="startBar" :bars="barsToDisplay" :ticks="ticksPerBar" :sequence="fileInfo.loadedSequence"/>
+            <track-display 
+                v-bind:key="ti" 
+                v-for="ti in fileInfo.loadedSequence.trackInfo" 
+                :position="playerPosition" 
+                :track="ti" 
+                :start="startBar" 
+                :bars="barsToDisplay" 
+                :ticks="ticksPerBar" 
+                :sequence="fileInfo.loadedSequence"
+                :width="1200"
+                :height="300"
+            />
         </div>
         <br><br>
     </div>
@@ -104,7 +124,7 @@
 
             //TODO: this should also be converted into a component
             var instance = this;
-            var url = "http://localhost:8080/sequencer/sequenceInfo";
+            var url = `http://${this.$api_base_url}/sequencer/sequenceInfo`;
             axios.get(url).then ((responseData) => {
                 //Vue.set(instance.fileInfo, 'loadedSequence', responseData.data);
                 this.fileInfo.loadedSequence = responseData.data;

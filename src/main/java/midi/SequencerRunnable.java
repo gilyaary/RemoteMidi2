@@ -16,7 +16,7 @@ public class SequencerRunnable implements Runnable{
     private Synthesizer synth;
 
     SequencerContext sequencerContext;
-    private long iPlayTimeInTicks;
+    private volatile long iPlayTimeInTicks;
 
     public long getiPlayTimeInTicks(){
         return iPlayTimeInTicks;
@@ -193,6 +193,7 @@ public class SequencerRunnable implements Runnable{
         double ticksPerSecond = beatsPerSecond * resolution; //resolution is how many ticks we have in a single beat
         double singleTickTime = 1.00 / ticksPerSecond;
         long songPositionMs = (long) (ticks * singleTickTime * 1000);
+        this.iPlayTimeInTicks = ticks;
         setSongPositionMs(songPositionMs);
     }
 

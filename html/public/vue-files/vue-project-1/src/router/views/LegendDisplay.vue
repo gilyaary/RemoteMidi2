@@ -9,8 +9,8 @@
         @touchend="touchEnd($event)"
         @touchcancel="touchCancel($event)"
         
-        width="1200" 
-        height="100">
+        :width="width" 
+        :height="height">
     </canvas>
 </template>
 <style>
@@ -41,6 +41,8 @@
         bars: Number,
         start: Number,
         sequence: Object,
+        width: Number,
+        height: Number
     },
     
 
@@ -128,6 +130,12 @@
             //console.log('TOUCH END EVENT ' + ev.touches.length);
             //console.log(ev);
             //cancel tracking the event
+
+            let newPosition = this.position + 1000;
+            //newPosition = 100000;
+            this.setPosition(newPosition);
+            
+
             this.touchState.pointCount = 0;
         },
         touchCancel(ev){
@@ -142,14 +150,14 @@
 
 
         setPosition: function(newPosition) {
-            let url = "http://localhost:8080/sequencer/position";
+            let url = `http://${this.$api_base_url}/sequencer/position`;
             let payload = 'position=' + newPosition;
+            //lock position changes
+            ApplicationState.getInstance().publish('playerPositionChanging', true);
+
             let responseData = axios.put(url, payload).then((responseData) => {
-                this.loaded = 1; 
-                console.log('setPosition returned');
-                this.position = newPosition;
-                ApplicationState.getInstance().publish('playerPosition', newPosition);
-                
+                //unlock position changes
+                ApplicationState.getInstance().publish('playerPositionChanging', false);
             });
         },
 
@@ -193,3 +201,11 @@
   }
 
 </script>
+<!--
+    let newPosition = this.position + 2000;
+    this.setPosition(newPosition);
+    start, bars, ticks, position, sequnce
+    bars - bars to show
+    start - start bar            
+
+-->

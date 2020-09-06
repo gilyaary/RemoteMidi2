@@ -24,7 +24,7 @@
       // });
       getMidiDeviceInfo: function() {
           console.log('getMidiDevicedInfo()');
-          let url = 'http://localhost:8080/sequencer/ports';
+          let url = `http://${this.$api_base_url}/sequencer/ports`;
           axios.get(url).then ((responseData) => {
               //TODO: Parse the JSON and display correctly
               this.midiDevices = responseData.data;

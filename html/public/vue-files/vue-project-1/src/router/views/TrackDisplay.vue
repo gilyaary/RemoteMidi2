@@ -1,5 +1,5 @@
 <template>
-     <canvas width="1200" height="200"></canvas>
+     <canvas :width="width" :height="height"></canvas>
 </template>
 <style>
     div{
@@ -28,6 +28,8 @@
         bars: Number,
         start: Number,
         sequence:Object,
+        width: Number,
+        height: Number,
     },
     methods: {
         displayTrack: function(el,parent){

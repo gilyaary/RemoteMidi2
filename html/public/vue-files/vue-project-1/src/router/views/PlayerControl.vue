@@ -62,7 +62,7 @@
   import ApplicationState from '../applicationState'
   import Subscriber from '../subscriber'
 
-  var loaded = 0;
+var loaded = 0;
   export default {
     name: 'player-control',
     data: () => {
@@ -87,8 +87,10 @@
     },
     methods: {
           play: function() {
-              let url = (!this.loaded || this.loaded == 0) ? "http://localhost:8080/sequencer/play" : "http://localhost:8080/sequencer/resume";
-              //let url = "http://localhost:8080/sequencer/resume";
+              let url = (!this.loaded || this.loaded == 0) ? 
+              `http://${this.$api_base_url}/sequencer/play` : 
+              `http://${this.$api_base_url}/sequencer/resume`;
+              //let url = api_base_url + "sequencer/resume";
               let responseData = axios.put(url, {}).then((responseData) => {
                   this.state = 'PLAY';
                   this.loaded = 1;        
@@ -97,7 +99,7 @@
               ApplicationState.getInstance().publish('playerControlSequencerState', 'Play');
           },
           stop: function() {
-              let url =  "http://localhost:8080/sequencer/stop";
+              let url =  `http://${this.$api_base_url}/sequencer/stop`;
               let responseData = axios.put(url, {}).then((responseData) => {
                   console.log('stop returned'); 
                   this.state = 'STOP';    
@@ -105,7 +107,7 @@
               });            
           },
           setPosition: function() {
-              let url = "http://localhost:8080/sequencer/position";
+              let url = `http://${this.$api_base_url}/sequencer/position`;
               let payload = 'position=' + this.position;
               let responseData = axios.put(url, payload).then((responseData) => {
                   this.loaded = 1; 

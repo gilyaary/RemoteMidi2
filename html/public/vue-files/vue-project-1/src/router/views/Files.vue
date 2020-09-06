@@ -66,7 +66,7 @@
             showFiles: function(){
                   this.fileNames = [];
                   var instance = this;
-                  let url = "http://localhost:8080/sequencer/files";
+                  let url = `http://${this.$api_base_url}/sequencer/files`;
                   axios.get(url).then ((responseData) => {
                       this.fileInfo.files = responseData.data;
                   });
@@ -83,7 +83,7 @@
             openFile: function(fileName){
                   console.log('openFile()');
                   var instance = this;
-                  var url = "http://localhost:8080/sequencer/load/" + encodeURI(fileName);
+                  var url = `http://${this.$api_base_url}/sequencer/load/` + encodeURI(fileName);
                   console.log('put to url: ' + url);
                   let responseData = axios.put(url, {}).then((responseData) => {
                       //console.log('recieved back data: ' );
