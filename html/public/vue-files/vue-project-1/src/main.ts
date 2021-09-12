@@ -9,7 +9,7 @@ import VueAxios from 'vue-axios'
 
 
 Vue.config.productionTip = false
-let host = '192.168.1.16';//window.location.hostname;
+let host = 'localhost'; //'192.168.1.16';//window.location.hostname;
 let port = 8081; //window.location.port;
 
 Vue.prototype.$api_base_url = `${host}:8080`;
